@@ -1,0 +1,9 @@
+# DB / Infrastructure ownership
+*Migration*.cs @anhelinaPriadko
+*DbContext*.cs @anhelinaPriadko
+*ModelSnapshot*.cs @anhelinaPriadko
+*.sql @anhelinaPriadko
+
+# Web ownership (optional)
+/Web/Controllers/ @anhelinaPriadko
+/Web/Views/ @anhelinaPriadko
