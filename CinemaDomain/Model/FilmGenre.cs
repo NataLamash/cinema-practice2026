@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace CinemaDomain.Model
 {
-    internal class Class1
+    internal class FilmGenre
     {
     }
 }
