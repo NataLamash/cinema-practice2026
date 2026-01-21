@@ -6,7 +6,15 @@ using System.Threading.Tasks;
 
 namespace CinemaDomain.Model
 {
-    internal class FilmActor
+    public class FilmActor
     {
+        public int FilmId { get; set; }
+        public int ActorId { get; set; }
+
+        public string CharacterName { get; set; }
+
+        public Film Film { get; set; }
+        public Actor Actor { get; set; }
     }
+
 }

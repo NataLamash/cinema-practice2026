@@ -25,8 +25,8 @@ namespace CinemaDomain.Model
 
         // Navigation
         public Producer Producer { get; set; }
-        public Company Company { get; set; }
 
+        public ICollection<FilmCompany> FilmCompanies { get; set; }
         public ICollection<Session> Sessions { get; set; }
         public ICollection<FilmGenre> FilmGenres { get; set; }
         public ICollection<FilmActor> FilmActors { get; set; }

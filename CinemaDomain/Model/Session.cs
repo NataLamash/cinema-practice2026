@@ -6,7 +6,22 @@ using System.Threading.Tasks;
 
 namespace CinemaDomain.Model
 {
-    internal class Session
+    public class Session
     {
+        public int SessionId { get; set; }
+
+        public int FilmId { get; set; }
+        public int HallId { get; set; }
+
+        public DateTime StartTime { get; set; }
+        public DateTime EndTime { get; set; }
+
+        public decimal BasePrice { get; set; }
+
+        public Film Film { get; set; }
+        public Hall Hall { get; set; }
+
+        public ICollection<Ticket> Tickets { get; set; }
     }
+
 }

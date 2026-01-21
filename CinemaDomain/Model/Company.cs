@@ -11,7 +11,7 @@ namespace CinemaDomain.Model
         public int Id { get; set; }
         public string Name { get; set; }
 
-        public ICollection<Film> Films { get; set; }
+        public ICollection<FilmCompany> FilmCompanies { get; set; }
     }
 
 }

@@ -6,7 +6,15 @@ using System.Threading.Tasks;
 
 namespace CinemaDomain.Model
 {
-    internal class SeatType
+    public class SeatType
     {
+        public int Id { get; set; }
+        public string Name { get; set; }
+
+        public decimal MarkUpInPercentage { get; set; }
+        public string Description { get; set; }
+
+        public ICollection<Seat> Seats { get; set; }
     }
+
 }

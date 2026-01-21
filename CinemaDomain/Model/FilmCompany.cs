@@ -6,7 +6,13 @@ using System.Threading.Tasks;
 
 namespace CinemaDomain.Model
 {
-    internal class FilmCompany
+    public class FilmCompany
     {
+        public int FilmId { get; set; }
+        public Film Film { get; set; }
+
+        public int CompanyId { get; set; }
+        public Company Company { get; set; }
     }
+
 }
