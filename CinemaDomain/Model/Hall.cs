@@ -10,7 +10,7 @@ namespace CinemaDomain.Model
 {
     public class Hall
     {
-        public int HallId { get; set; }
+        public int Id { get; set; }
         public string Name { get; set; }
 
         public short NumberOfRows { get; set; }

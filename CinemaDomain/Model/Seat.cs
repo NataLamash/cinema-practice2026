@@ -8,7 +8,7 @@ namespace CinemaDomain.Model
 {
     public class Seat
     {
-        public int SeatId { get; set; }
+        public int Id { get; set; }
 
         public int HallId { get; set; }
         public int SeatTypeId { get; set; }
