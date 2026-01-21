@@ -200,6 +200,14 @@ namespace CinemaInfrastructure
                 .HasMaxLength(50)
                 .IsRequired();
 
+            modelBuilder.Entity<User>()
+                .Property(u => u.RegistrationDate)
+                .IsRequired();
+
+            modelBuilder.Entity<Order>()
+                .Property(o => o.OrderDate)
+                .IsRequired();
+
             modelBuilder.Entity<OrderStatus>()
                 .Property(os => os.Name)
                 .HasMaxLength(50)
@@ -210,9 +218,29 @@ namespace CinemaInfrastructure
                 .HasMaxLength(50)
                 .IsRequired();
 
+            modelBuilder.Entity<Hall>()
+                .Property(h => h.NumberOfRows)
+                .IsRequired();
+
+            modelBuilder.Entity<Hall>()
+                .Property(h => h.SeatsInRow)
+                .IsRequired();
+
             modelBuilder.Entity<HallType>()
                 .Property(h => h.Name)
                 .HasMaxLength(50)
+                .IsRequired();
+
+            modelBuilder.Entity<Seat>()
+                .Property(s => s.HallId)
+                .IsRequired();
+
+            modelBuilder.Entity<Seat>()
+                .Property(s => s.Row)
+                .IsRequired();
+
+            modelBuilder.Entity<Seat>()
+                .Property(s => s.NumberInRow)
                 .IsRequired();
 
             modelBuilder.Entity<SeatType>()
@@ -220,14 +248,18 @@ namespace CinemaInfrastructure
                 .HasMaxLength(50)
                 .IsRequired();
 
+
             modelBuilder.Entity<SeatType>()
                 .Property(st => st.MarkUpInPercentage)
-                .HasMaxLength(50)
                 .HasPrecision(10, 2);
 
             modelBuilder.Entity<Film>()
                 .Property(f => f.Name)
                 .HasMaxLength(50)
+                .IsRequired();
+
+            modelBuilder.Entity<Film>()
+                .Property(f => f.DurationMinutes)
                 .IsRequired();
 
             modelBuilder.Entity<Film>()
@@ -240,28 +272,59 @@ namespace CinemaInfrastructure
 
             modelBuilder.Entity<Producer>()
                 .Property(p => p.Name)
-                .HasMaxLength(150);
+                .HasMaxLength(150)
+                .IsRequired();
 
             modelBuilder.Entity<Company>()
-                .Property(p => p.Name)
-                .HasMaxLength(150);
+                .Property(c => c.Name)
+                .HasMaxLength(150)
+                .IsRequired();
 
             modelBuilder.Entity<Genre>()
-                .Property(p => p.Name)
-                .HasMaxLength(50);
+                .Property(g => g.Name)
+                .HasMaxLength(50)
+                .IsRequired();
 
             modelBuilder.Entity<Actor>()
-                .Property(p => p.Name)
+                .Property(a => a.Name)
                 .HasMaxLength(150)
                 .IsRequired();
 
             modelBuilder.Entity<Actor>()
-                .Property(p => p.Name)
+                .Property(a => a.PhotoUrl)
                 .HasMaxLength(512);
 
             modelBuilder.Entity<Session>()
-                .Property(p => p.BasePrice)
+                .Property(s => s.BasePrice)
                 .HasPrecision(10, 2);
+
+            modelBuilder.Entity<Session>()
+                .Property(s => s.StartTime)
+                .IsRequired();
+
+            modelBuilder.Entity<Session>()
+                .Property(s => s.EndTime)
+                .IsRequired();
+
+            //  SEED DATA
+
+            modelBuilder.Entity<OrderStatus>().HasData(
+                new OrderStatus { Id = 1, Name = "Reserved" },
+                new OrderStatus { Id = 2, Name = "Paid" },
+                new OrderStatus { Id = 3, Name = "Cancelled" }
+            );
+
+            modelBuilder.Entity<HallType>().HasData(
+                new HallType { Id = 1, Name = "Standard", Description = "Regular cinema hall" },
+                new HallType { Id = 2, Name = "IMAX", Description = "IMAX large format hall" },
+                new HallType { Id = 3, Name = "VIP", Description = "VIP hall with premium seats" }
+            );
+
+            modelBuilder.Entity<SeatType>().HasData(
+                new SeatType { Id = 1, Name = "Standard", MarkUpInPercentage = 0, Description = "Regular seat" },
+                new SeatType { Id = 2, Name = "Comfort", MarkUpInPercentage = 15, Description = "More comfortable seat" },
+                new SeatType { Id = 3, Name = "VIP", MarkUpInPercentage = 30, Description = "Premium seat" }
+            );
         }
     }
 }
