@@ -49,7 +49,7 @@ namespace CinemaInfrastructure
                 entity.HasIndex(u => u.Email).IsUnique();
                 entity.HasIndex(u => u.AzureIdentityId).IsUnique();
 
-                entity.Property(u => u.AzureIdentityId).HasMaxLength(450).IsRequired();
+                entity.Property(u => u.AzureIdentityId).HasMaxLength(450).IsRequired(false);
                 entity.Property(u => u.Email).HasMaxLength(256).IsRequired();
                 entity.Property(u => u.FirstName).HasMaxLength(50).IsRequired();
                 entity.Property(u => u.LastName).HasMaxLength(50).IsRequired();

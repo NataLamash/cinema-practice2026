@@ -9,7 +9,7 @@ namespace CinemaDomain.Model
     public class Company
     {
         public int Id { get; set; }
-        public string Name { get; set; }
+        public required string Name { get; set; }
 
         public ICollection<FilmCompany> FilmCompanies { get; set; } = new List<FilmCompany>();
     }
