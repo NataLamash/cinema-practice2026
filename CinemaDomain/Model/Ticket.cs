@@ -15,9 +15,9 @@ namespace CinemaDomain.Model
         public int SessionId { get; set; }
         public int SeatId { get; set; }
 
-        public Order Order { get; set; }
-        public Session Session { get; set; }
-        public Seat Seat { get; set; }
+        public Order? Order { get; set; }
+        public Session? Session { get; set; }
+        public Seat? Seat { get; set; }
     }
 
 }

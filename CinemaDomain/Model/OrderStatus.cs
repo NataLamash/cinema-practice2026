@@ -12,7 +12,7 @@ namespace CinemaDomain.Model
         public string Name { get; set; }
 
         // Navigation
-        public ICollection<Order> Orders { get; set; }
+        public ICollection<Order> Orders { get; set; } = new List<Order>();
     }
 
 }

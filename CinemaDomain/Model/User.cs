@@ -19,8 +19,8 @@ namespace CinemaDomain.Model
         public DateTime RegistrationDate { get; set; }
 
         // Navigation
-        public ICollection<Order> Orders { get; set; }
-        public ICollection<FilmRating> FilmRatings { get; set; }
+        public ICollection<Order> Orders { get; set; } = new List<Order>();
+        public ICollection<FilmRating> FilmRatings { get; set; } = new List<FilmRating>();
     }
 
 }

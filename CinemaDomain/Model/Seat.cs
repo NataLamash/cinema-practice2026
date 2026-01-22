@@ -17,9 +17,9 @@ namespace CinemaDomain.Model
         public short NumberInRow { get; set; }
 
         // Navigation
-        public Hall Hall { get; set; }
-        public SeatType SeatType { get; set; }
-        public ICollection<Ticket> Tickets { get; set; }
+        public Hall? Hall { get; set; }
+        public SeatType? SeatType { get; set; }
+        public ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
     }
 
 }

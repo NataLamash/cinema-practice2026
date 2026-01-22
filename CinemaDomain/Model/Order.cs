@@ -17,9 +17,9 @@ namespace CinemaDomain.Model
         public DateTime OrderDate { get; set; }
 
         // Navigation
-        public User User { get; set; }
-        public OrderStatus Status { get; set; }
-        public ICollection<Ticket> Tickets { get; set; }
+        public User? User { get; set; }
+        public OrderStatus? Status { get; set; }
+        public ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
     }
 
 }

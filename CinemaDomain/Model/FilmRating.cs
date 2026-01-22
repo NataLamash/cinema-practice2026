@@ -14,11 +14,11 @@ namespace CinemaDomain.Model
         public int FilmId { get; set; }
 
         public byte RatingValue { get; set; }
-        public string Comment { get; set; }
+        public string? Comment { get; set; }
         public DateTime CreatedAt { get; set; }
 
-        public User User { get; set; }
-        public Film Film { get; set; }
+        public User? User { get; set; } 
+        public Film? Film { get; set; }
     }
 
 }

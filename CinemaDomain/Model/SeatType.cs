@@ -11,10 +11,10 @@ namespace CinemaDomain.Model
         public int Id { get; set; }
         public string Name { get; set; }
 
-        public decimal MarkUpInPercentage { get; set; }
-        public string Description { get; set; }
+        public decimal? MarkUpInPercentage { get; set; }
+        public string? Description { get; set; }
 
-        public ICollection<Seat> Seats { get; set; }
+        public ICollection<Seat> Seats { get; set; } = new List<Seat>();
     }
 
 }

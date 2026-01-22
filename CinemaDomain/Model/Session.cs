@@ -18,10 +18,10 @@ namespace CinemaDomain.Model
 
         public decimal BasePrice { get; set; }
 
-        public Film Film { get; set; }
-        public Hall Hall { get; set; }
+        public Film? Film { get; set; }
+        public Hall? Hall { get; set; }
 
-        public ICollection<Ticket> Tickets { get; set; }
+        public ICollection<Ticket> Tickets { get; set; } = new List<Ticket>();
     }
 
 }

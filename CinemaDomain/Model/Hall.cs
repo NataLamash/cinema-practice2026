@@ -19,9 +19,9 @@ namespace CinemaDomain.Model
         public int HallTypeId { get; set; }
 
         // Navigation
-        public HallType HallType { get; set; }
-        public ICollection<Seat> Seats { get; set; }
-        public ICollection<Session> Sessions { get; set; }
+        public HallType? HallType { get; set; }
+        public ICollection<Seat> Seats { get; set; } = new List<Seat>();
+        public ICollection<Session> Sessions { get; set; } = new List<Session>();
     }
 
 }
