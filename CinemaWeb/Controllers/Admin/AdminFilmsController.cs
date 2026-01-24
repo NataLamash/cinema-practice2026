@@ -1,12 +1,23 @@
-﻿using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using CinemaInfrastructure;
+using CinemaDomain.Model; 
+
 
 namespace CinemaWeb.Controllers.Admin
 {
     public class AdminFilmsController : Controller
     {
-        public IActionResult Index()
+        private readonly CinemaDbContext _context;
+
+        public AdminFilmsController(CinemaDbContext context)
         {
-            return View();
+            _context = context;
+        }
+
+        public async Task<IActionResult> Index()
+        {
+            return View(await _context.Films.ToListAsync());
         }
     }
 }
