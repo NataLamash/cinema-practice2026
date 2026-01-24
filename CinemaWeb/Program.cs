@@ -1,4 +1,4 @@
-﻿using CinemaInfrastructure;
+using CinemaInfrastructure;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
