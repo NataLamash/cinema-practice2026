@@ -1,0 +1,37 @@
+@model CinemaDomain.Model.Film
+
+@{
+    ViewData["Title"] = "Видалити фільм";
+}
+
+<div class="container mt-5">
+    <div class="alert alert-danger shadow-sm">
+        <h3 class="alert-heading">Ви впевнені, що хочете видалити цей фільм?</h3>
+        <p>Цю дію неможливо скасувати. Якщо у фільма є активні сеанси, видалення буде заблоковано.</p>
+    </div>
+
+    <div class="card border-danger">
+        <div class="card-header bg-danger text-white">
+            Видалення: @Model.Name
+        </div>
+        <div class="card-body">
+            <dl class="row">
+                <dt class="col-sm-2">Назва</dt>
+                <dd class="col-sm-10">@Model.Name</dd>
+
+                <dt class="col-sm-2">Рік виходу</dt>
+                <dd class="col-sm-10">@Model.ReleaseDate?.Year</dd>
+
+                <dt class="col-sm-2">Продюсер</dt>
+                <dd class="col-sm-10">@(Model.Producer?.Name ?? "-")</dd>
+            </dl>
+        </div>
+        <div class="card-footer bg-transparent border-danger">
+            <form asp-action="Delete">
+                <input type="hidden" asp-for="Id" />
+                <button type="submit" class="btn btn-danger">Так, видалити</button>
+                <a asp-action="Index" class="btn btn-secondary">Скасувати</a>
+            </form>
+        </div>
+    </div>
+</div>

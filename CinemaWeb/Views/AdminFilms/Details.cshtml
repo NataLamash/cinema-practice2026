@@ -1,0 +1,97 @@
+@model CinemaDomain.Model.Film
+
+@{
+    ViewData["Title"] = "Деталі фільму";
+}
+
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <h2 class="mb-0">@Model.Name</h2>
+            <span class="badge bg-warning text-dark">@Model.AllowedMinAge+</span>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 text-center">
+                    @if (!string.IsNullOrEmpty(Model.PosterUrl))
+                    {
+                        <img src="@Model.PosterUrl" alt="@Model.Name" class="img-fluid rounded shadow-sm" style="max-height: 500px;" />
+                    }
+                    else
+                    {
+                        <div class="alert alert-secondary py-5">Немає зображення</div>
+                    }
+
+                    @if (!string.IsNullOrEmpty(Model.TrailerUrl))
+                    {
+                        <div class="mt-3">
+                            <a href="@Model.TrailerUrl" target="_blank" class="btn btn-danger w-100">
+                                <i class="bi bi-youtube"></i> Дивитися трейлер
+                            </a>
+                        </div>
+                    }
+                </div>
+
+                <div class="col-md-8">
+                    <dl class="row">
+                        <dt class="col-sm-3">Опис:</dt>
+                        <dd class="col-sm-9">@Model.Description</dd>
+
+                        <dt class="col-sm-3">Дата виходу:</dt>
+                        <dd class="col-sm-9">@Model.ReleaseDate?.ToShortDateString()</dd>
+
+                        <dt class="col-sm-3">Тривалість:</dt>
+                        <dd class="col-sm-9">@Model.DurationMinutes хв.</dd>
+
+                        <dt class="col-sm-3">Продюсер:</dt>
+                        <dd class="col-sm-9">@(Model.Producer?.Name ?? "Не вказано")</dd>
+
+                        <hr class="my-3" />
+
+                        <dt class="col-sm-3">Жанри:</dt>
+                        <dd class="col-sm-9">
+                            @if (Model.FilmGenres.Any())
+                            {
+                                @foreach (var fg in Model.FilmGenres)
+                                {
+                                    <span class="badge bg-secondary me-1">@fg.Genre?.Name</span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted">Не вказано</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-3">Актори:</dt>
+                        <dd class="col-sm-9">
+                            @if (Model.FilmActors.Any())
+                            {
+                                <ul class="list-unstyled">
+                                    @foreach (var fa in Model.FilmActors)
+                                    {
+                                        <li>@fa.Actor?.Name <span class="text-muted fst-italic">(@(string.IsNullOrEmpty(fa.CharacterName) ? "?" : fa.CharacterName))</span></li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+
+                                <span class="text-muted">Немає даних</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-3">Компанії:</dt>
+                        <dd class="col-sm-9">
+                            @string.Join(", ", Model.FilmCompanies.Select(fc => fc.Company?.Name))
+                        </dd>
+                    </dl>
+                </div>
+            </div>
+        </div>
+        <div class="card-footer text-end">
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редагувати</a>
+            <a asp-action="Index" class="btn btn-secondary">Назад до списку</a>
+        </div>
+    </div>
+</div>

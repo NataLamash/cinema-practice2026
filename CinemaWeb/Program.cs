@@ -1,4 +1,4 @@
-﻿using CinemaInfrastructure;
+using CinemaInfrastructure;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -14,6 +14,7 @@ builder.Services.AddDbContext<CinemaDbContext>(options =>
             sqlOptions.EnableRetryOnFailure();
         })
 );
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
