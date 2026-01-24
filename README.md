@@ -95,5 +95,5 @@ SCRUM-12: fix validation for duration
 ```bash
 dotnet ef database update
 ```
-- If you see migration conflicts, contact the DB owner before merging.
+- If you see migration conflicts, contact the DB owner before merging. <br>
 Database (MSQL Server + migrations)
