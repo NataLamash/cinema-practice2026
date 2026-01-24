@@ -1,8 +1,6 @@
 @model CinemaWeb.ViewModels.SessionViewModel
 
 @{
-    // Форматуємо поточну дату для обмеження вибору (min)
-    // Формат yyyy-MM-ddTHH:mm — єдиний, який коректно сприймає інпут datetime-local
     var now = DateTime.Now.ToString("yyyy-MM-ddTHH:mm");
 }
 
@@ -38,7 +36,6 @@
                         <div class="row">
                             <div class="col-md-6 mb-3">
                                 <label asp-for="StartTime" class="form-label font-weight-bold">Початок</label>
-                                @* step="60" прибирає секунди, min забороняє минуле *@
                                 <input asp-for="StartTime" class="form-control" type="datetime-local" step="60" min="@now" />
                                 <span asp-validation-for="StartTime" class="text-danger"></span>
                             </div>

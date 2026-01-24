@@ -28,12 +28,10 @@ namespace CinemaWeb.Controllers.Admin
         }
 
         // GET: AdminSessions/Create
-        // GET: AdminSessions/Create
         public async Task<IActionResult> Create()
         {
             await PopulateListsAsync();
 
-            // Створюємо дату, обнуляючи секунди та мілісекунди вручну
             var start = DateTime.Now.AddHours(1);
             var end = DateTime.Now.AddHours(3);
 
@@ -48,7 +46,6 @@ namespace CinemaWeb.Controllers.Admin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(SessionViewModel model)
         {
-            // Обнуляємо секунди перед валідацією та збереженням
             model.StartTime = new DateTime(model.StartTime.Year, model.StartTime.Month, model.StartTime.Day, model.StartTime.Hour, model.StartTime.Minute, 0);
             model.EndTime = new DateTime(model.EndTime.Year, model.EndTime.Month, model.EndTime.Day, model.EndTime.Hour, model.EndTime.Minute, 0);
 
@@ -60,7 +57,7 @@ namespace CinemaWeb.Controllers.Admin
                 {
                     FilmId = model.FilmId,
                     HallId = model.HallId,
-                    StartTime = model.StartTime, // Тепер тут гарантовано 00 секунд
+                    StartTime = model.StartTime,
                     EndTime = model.EndTime,
                     BasePrice = model.BasePrice
                 };
@@ -83,7 +80,7 @@ namespace CinemaWeb.Controllers.Admin
 
             var model = new SessionViewModel
             {
-                Id = session.Id, // Виправлено: звернення до model.Id
+                Id = session.Id, 
                 FilmId = session.FilmId,
                 HallId = session.HallId,
                 StartTime = session.StartTime,
@@ -98,7 +95,7 @@ namespace CinemaWeb.Controllers.Admin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, SessionViewModel model)
         {
-            if (id != model.Id) return NotFound(); // Виправлено: model.Id
+            if (id != model.Id) return NotFound();
 
             await RunBusinessValidations(model);
 
@@ -145,7 +142,6 @@ namespace CinemaWeb.Controllers.Admin
 
         private async Task RunBusinessValidations(SessionViewModel model)
         {
-            // Перевірка існування фільму та залу
             if (!await _context.Films.AnyAsync(f => f.Id == model.FilmId))
                 ModelState.AddModelError("FilmId", "Обраний фільм не існує.");
 
@@ -170,10 +166,9 @@ namespace CinemaWeb.Controllers.Admin
             if (model.StartTime < DateTime.Now)
                 ModelState.AddModelError("StartTime", "Не можна створювати сеанси у минулому.");
 
-            // Перевірка накладок (Overlap) з урахуванням 20 хв прибирання
             int cleaningTime = 20;
             bool hasOverlap = await _context.Sessions.AnyAsync(s =>
-                s.Id != model.Id && // Виправлено: model.Id
+                s.Id != model.Id && 
                 s.HallId == model.HallId &&
                 model.StartTime < s.EndTime.AddMinutes(cleaningTime) &&
                 model.EndTime.AddMinutes(cleaningTime) > s.StartTime);
