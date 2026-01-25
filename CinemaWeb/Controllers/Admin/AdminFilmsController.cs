@@ -227,20 +227,6 @@ namespace CinemaWeb.Controllers.Admin
             return View(model);
         }
 
-        // GET: AdminFilms/Delete/5
-        public async Task<IActionResult> Delete(int? id)
-        {
-            if (id == null) return NotFound();
-
-            var film = await _context.Films
-                .Include(f => f.Producer)
-                .FirstOrDefaultAsync(m => m.Id == id);
-
-            if (film == null) return NotFound();
-
-            return View(film);
-        }
-
         // POST: AdminFilms/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
@@ -249,20 +235,25 @@ namespace CinemaWeb.Controllers.Admin
             var film = await _context.Films.FindAsync(id);
             if (film != null)
             {
-                // Перевірка на наявність сеансів (як у старому контролері)
+                // Перевірка на зв'язки (сеанси)
                 var hasSessions = await _context.Sessions.AnyAsync(s => s.FilmId == id);
                 if (hasSessions)
                 {
-                    TempData["ErrorMessage"] = "Неможливо видалити фільм, оскільки існують пов'язані сеанси.";
+                    TempData["ErrorMessage"] = "Cannot delete film because it has related sessions.";
                     return RedirectToAction(nameof(Index));
                 }
 
-                // Видаляємо рейтинги вручну, якщо не налаштовано Cascade Delete в БД
+                // Видалення рейтингів
                 var ratings = _context.FilmRatings.Where(r => r.FilmId == id);
                 _context.FilmRatings.RemoveRange(ratings);
 
                 _context.Films.Remove(film);
                 await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Film deleted successfully.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Film not found.";
             }
             return RedirectToAction(nameof(Index));
         }

@@ -1,11 +1,11 @@
 @model CinemaWeb.ViewModels.FilmFormViewModel
 
 @{
-    ViewData["Title"] = "Редагування фільму";
+    ViewData["Title"] = "Edit Film";
 }
 
 <div class="container">
-    <h2 class="mb-4">Редагувати: @Model.Name</h2>
+    <h2 class="mb-4">Edit Film: @Model.Name</h2>
 
     <form asp-action="Edit" method="post">
         <input type="hidden" asp-for="Id" />
@@ -15,10 +15,10 @@
         <div class="row">
             <div class="col-md-6">
                 <div class="card mb-3">
-                    <div class="card-header bg-warning text-dark">Основна інформація</div>
+                    <div class="card-header bg-warning text-dark">Basic Information</div>
                     <div class="card-body">
                         <div class="mb-3">
-                            <label asp-for="Name" class="form-label"></label>
+                            <label asp-for="Name" class="form-label fw-bold"></label> <span class="text-danger">*</span>
                             <input asp-for="Name" class="form-control" />
                             <span asp-validation-for="Name" class="text-danger"></span>
                         </div>
@@ -29,7 +29,7 @@
                         </div>
                         <div class="row">
                             <div class="col-6 mb-3">
-                                <label asp-for="DurationMinutes" class="form-label"></label>
+                                <label asp-for="DurationMinutes" class="form-label fw-bold"></label> <span class="text-danger">*</span>
                                 <input asp-for="DurationMinutes" class="form-control" type="number" />
                                 <span asp-validation-for="DurationMinutes" class="text-danger"></span>
                             </div>
@@ -47,7 +47,7 @@
                     </div>
                 </div>
                 <div class="card mb-3">
-                    <div class="card-header bg-secondary text-white">Медіа</div>
+                    <div class="card-header bg-secondary text-white">Media</div>
                     <div class="card-body">
                         <div class="mb-3">
                             <label asp-for="PosterUrl" class="form-label"></label>
@@ -65,31 +65,31 @@
 
             <div class="col-md-6">
                 <div class="card mb-3">
-                    <div class="card-header bg-info text-white">Зв'язки</div>
+                    <div class="card-header bg-info text-white">Relations</div>
                     <div class="card-body">
                         <div class="mb-3">
-                            <label asp-for="ProducerId" class="form-label fw-bold"></label>
+                            <label asp-for="ProducerId" class="form-label"></label>
                             <select asp-for="ProducerId" class="form-select" asp-items="Model.ProducersList">
-                                <option value="">-- Оберіть продюсера --</option>
+                                <option value="">-- Select Producer (None) --</option>
                             </select>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="SelectedGenreIds" class="form-label fw-bold"></label>
+                            <label asp-for="SelectedGenreIds" class="form-label"></label>
                             <select asp-for="SelectedGenreIds" class="form-select" asp-items="Model.GenresList" multiple style="min-height: 120px;"></select>
-                            <small class="text-muted d-block mt-1">Утримуйте Ctrl (Cmd) для вибору кількох.</small>
+                            <small class="text-muted d-block mt-1">Hold Ctrl (Cmd) to select multiple.</small>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="SelectedActorIds" class="form-label fw-bold"></label>
+                            <label asp-for="SelectedActorIds" class="form-label"></label>
                             <select asp-for="SelectedActorIds" class="form-select" asp-items="Model.ActorsList" multiple style="min-height: 150px;"></select>
-                            <small class="text-muted d-block mt-1">Утримуйте Ctrl (Cmd) для вибору кількох.</small>
+                            <small class="text-muted d-block mt-1">Hold Ctrl (Cmd) to select multiple.</small>
                         </div>
 
                         <div class="mb-3">
-                            <label asp-for="SelectedCompanyIds" class="form-label fw-bold"></label>
+                            <label asp-for="SelectedCompanyIds" class="form-label"></label>
                             <select asp-for="SelectedCompanyIds" class="form-select" asp-items="Model.CompaniesList" multiple style="min-height: 120px;"></select>
-                            <small class="text-muted d-block mt-1">Утримуйте Ctrl (Cmd) для вибору кількох.</small>
+                            <small class="text-muted d-block mt-1">Hold Ctrl (Cmd) to select multiple.</small>
                         </div>
                     </div>
                 </div>
@@ -97,8 +97,8 @@
         </div>
 
         <div class="d-flex gap-2 mt-3 mb-5">
-            <button type="submit" class="btn btn-warning btn-lg">Оновити фільм</button>
-            <a asp-action="Index" class="btn btn-outline-secondary btn-lg">Назад</a>
+            <button type="submit" class="btn btn-warning btn-lg">Update Film</button>
+            <a asp-action="Index" class="btn btn-outline-secondary btn-lg">Back</a>
         </div>
     </form>
 </div>
