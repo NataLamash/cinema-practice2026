@@ -82,7 +82,7 @@ namespace CinemaWeb.Controllers.Admin
                     Description = model.Description,
                     ReleaseDate = model.ReleaseDate,
                     DurationMinutes = model.DurationMinutes,
-                    AllowedMinAge = model.AllowedMinAge,
+                    AllowedMinAge = model.AllowedMinAge ?? 0,
                     PosterUrl = posterPath,
                     TrailerUrl = model.TrailerUrl,
                     ProducerId = model.ProducerId
@@ -162,7 +162,7 @@ namespace CinemaWeb.Controllers.Admin
                 filmToUpdate.Description = model.Description;
                 filmToUpdate.ReleaseDate = model.ReleaseDate;
                 filmToUpdate.DurationMinutes = model.DurationMinutes;
-                filmToUpdate.AllowedMinAge = model.AllowedMinAge;
+                filmToUpdate.AllowedMinAge = model.AllowedMinAge ?? 0;
                 filmToUpdate.TrailerUrl = model.TrailerUrl;
                 filmToUpdate.ProducerId = model.ProducerId;
 
