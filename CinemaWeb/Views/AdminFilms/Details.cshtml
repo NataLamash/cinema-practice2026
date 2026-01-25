@@ -8,18 +8,18 @@
     <div class="card shadow">
         <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
             <h2 class="mb-0">@Model.Name</h2>
-            <span class="badge bg-warning text-dark">@Model.AllowedMinAge+</span>
+            <span class="badge bg-warning text-dark">Age: @Model.AllowedMinAge+</span>
         </div>
         <div class="card-body">
             <div class="row">
                 <div class="col-md-4 text-center">
                     @if (!string.IsNullOrEmpty(Model.PosterUrl))
                     {
-                        <img src="@Model.PosterUrl" alt="@Model.Name" class="img-fluid rounded shadow-sm" style="max-height: 500px;" />
+                        <img src="@Model.PosterUrl" alt="@Model.Name" class="img-fluid rounded shadow-sm" style="max-height: 500px; object-fit: cover;" />
                     }
                     else
                     {
-                        <div class="alert alert-secondary py-5">No Image Available</div>
+                        <div class="alert alert-secondary py-5">No Poster Available</div>
                     }
 
                     @if (!string.IsNullOrEmpty(Model.TrailerUrl))
@@ -35,10 +35,16 @@
                 <div class="col-md-8">
                     <dl class="row">
                         <dt class="col-sm-3">Description:</dt>
-                        <dd class="col-sm-9">@(string.IsNullOrEmpty(Model.Description) ? "No description" : Model.Description)</dd>
+                        <dd class="col-sm-9">
+                            @(string.IsNullOrEmpty(Model.Description) ? "No description provided." : Model.Description)
+                        </dd>
 
                         <dt class="col-sm-3">Release Date:</dt>
-                        <dd class="col-sm-9">@(Model.ReleaseDate.HasValue? Model.ReleaseDate.Value.ToShortDateString() : "Unknown")</dd>
+                        <dd class="col-sm-9">
+                            @(Model.ReleaseDate.HasValue
+                                                        ? Model.ReleaseDate.Value.ToString("MMMM d, yyyy")
+                                                        : "Unknown")
+                        </dd>
 
                         <dt class="col-sm-3">Duration:</dt>
                         <dd class="col-sm-9">@Model.DurationMinutes min</dd>
@@ -67,10 +73,12 @@
                         <dd class="col-sm-9">
                             @if (Model.FilmActors.Any())
                             {
-                                <ul class="list-unstyled">
+                                <ul class="list-unstyled mb-0">
                                     @foreach (var fa in Model.FilmActors)
                                     {
-                                        <li>@fa.Actor?.Name</li>
+                                        <li>
+                                            <i class="bi bi-person-fill text-muted"></i> @fa.Actor?.Name
+                                        </li>
                                     }
                                 </ul>
                             }
@@ -85,7 +93,12 @@
                         <dd class="col-sm-9">
                             @if (Model.FilmCompanies.Any())
                             {
-                                @string.Join(", ", Model.FilmCompanies.Select(fc => fc.Company?.Name))
+                                <ul class="list-unstyled mb-0">
+                                    @foreach (var fc in Model.FilmCompanies)
+                                    {
+                                        <li>@fc.Company?.Name</li>
+                                    }
+                                </ul>
                             }
                             else
                             {
@@ -98,8 +111,8 @@
             </div>
         </div>
         <div class="card-footer text-end">
-            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit</a>
-            <a asp-action="Index" class="btn btn-secondary">Back to List</a>
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit Film</a>
+            <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
         </div>
     </div>
 </div>

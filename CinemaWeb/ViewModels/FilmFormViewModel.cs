@@ -32,11 +32,13 @@ namespace CinemaWeb.ViewModels
         [Display(Name = "Poster URL")]
         public string? PosterUrl { get; set; }
 
+        [Display(Name = "Download poster")]
+        public IFormFile? PosterFile { get; set; }
+
         [Url(ErrorMessage = "Invalid URL format")]
         [Display(Name = "Trailer URL")]
         public string? TrailerUrl { get; set; }
 
-        // --- Dropdowns (Nullable, so they are optional) ---
 
         [Display(Name = "Producer")]
         public int? ProducerId { get; set; }

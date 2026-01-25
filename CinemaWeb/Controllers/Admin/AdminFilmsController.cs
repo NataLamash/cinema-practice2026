@@ -4,20 +4,20 @@ using CinemaWeb.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using System.Text.Json;
 
 namespace CinemaWeb.Controllers.Admin
 {
     public class AdminFilmsController : Controller
     {
         private readonly CinemaDbContext _context;
+        private readonly IWebHostEnvironment _webHostEnvironment;
 
-        public AdminFilmsController(CinemaDbContext context)
+        public AdminFilmsController(CinemaDbContext context, IWebHostEnvironment webHostEnvironment)
         {
             _context = context;
+            _webHostEnvironment = webHostEnvironment;
         }
 
-        // GET: AdminFilms
         public async Task<IActionResult> Index()
         {
             var films = await _context.Films
@@ -31,21 +31,26 @@ namespace CinemaWeb.Controllers.Admin
         // GET: AdminFilms/Details/5
         public async Task<IActionResult> Details(int? id)
         {
-            if (id == null) return NotFound();
+            if (id == null)
+            {
+                return NotFound();
+            }
 
             var film = await _context.Films
                 .Include(f => f.Producer)
-                .Include(f => f.FilmCompanies).ThenInclude(fc => fc.Company)
                 .Include(f => f.FilmGenres).ThenInclude(fg => fg.Genre)
                 .Include(f => f.FilmActors).ThenInclude(fa => fa.Actor)
+                .Include(f => f.FilmCompanies).ThenInclude(fc => fc.Company)
                 .FirstOrDefaultAsync(m => m.Id == id);
 
-            if (film == null) return NotFound();
+            if (film == null)
+            {
+                return NotFound();
+            }
 
             return View(film);
         }
 
-        // GET: AdminFilms/Create
         public async Task<IActionResult> Create()
         {
             var viewModel = new FilmFormViewModel();
@@ -53,18 +58,24 @@ namespace CinemaWeb.Controllers.Admin
             return View(viewModel);
         }
 
-        // POST: AdminFilms/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(FilmFormViewModel model)
         {
             if (CheckNameDuplication(model.Name))
             {
-                ModelState.AddModelError("Name", "A film with that name already exists!");
+                ModelState.AddModelError("Name", "Фільм з такою назвою вже існує!");
             }
 
             if (ModelState.IsValid)
             {
+                string? posterPath = null;
+
+                if (model.PosterFile != null)
+                {
+                    posterPath = await SaveImageAsync(model.PosterFile);
+                }
+
                 var film = new Film
                 {
                     Name = model.Name,
@@ -72,7 +83,7 @@ namespace CinemaWeb.Controllers.Admin
                     ReleaseDate = model.ReleaseDate,
                     DurationMinutes = model.DurationMinutes,
                     AllowedMinAge = model.AllowedMinAge,
-                    PosterUrl = model.PosterUrl,
+                    PosterUrl = posterPath,
                     TrailerUrl = model.TrailerUrl,
                     ProducerId = model.ProducerId
                 };
@@ -80,31 +91,9 @@ namespace CinemaWeb.Controllers.Admin
                 _context.Films.Add(film);
                 await _context.SaveChangesAsync();
 
-                if (model.SelectedGenreIds.Any())
-                {
-                    foreach (var genreId in model.SelectedGenreIds)
-                    {
-                        _context.FilmGenres.Add(new FilmGenre { FilmId = film.Id, GenreId = genreId });
-                    }
-                }
+                await UpdateRelations(film.Id, model);
 
-                if (model.SelectedActorIds.Any())
-                {
-                    foreach (var actorId in model.SelectedActorIds)
-                    {
-                        _context.FilmActors.Add(new FilmActor { FilmId = film.Id, ActorId = actorId, CharacterName = "TBD" });
-                    }
-                }
-
-                if (model.SelectedCompanyIds.Any())
-                {
-                    foreach (var companyId in model.SelectedCompanyIds)
-                    {
-                        _context.FilmCompanies.Add(new FilmCompany { FilmId = film.Id, CompanyId = companyId });
-                    }
-                }
-
-                await _context.SaveChangesAsync();
+                TempData["SuccessMessage"] = "Film created successfully!";
                 return RedirectToAction(nameof(Index));
             }
 
@@ -144,12 +133,20 @@ namespace CinemaWeb.Controllers.Admin
             return View(viewModel);
         }
 
-        // POST: AdminFilms/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(int id, FilmFormViewModel model)
         {
             if (id != model.Id) return NotFound();
+
+            ModelState.Remove(nameof(model.ProducersList));
+            ModelState.Remove(nameof(model.GenresList));
+            ModelState.Remove(nameof(model.ActorsList));
+            ModelState.Remove(nameof(model.CompaniesList));
+            ModelState.Remove(nameof(model.SelectedGenreIds));
+            ModelState.Remove(nameof(model.SelectedActorIds));
+            ModelState.Remove(nameof(model.SelectedCompanyIds));
+            ModelState.Remove(nameof(model.PosterUrl));
 
             if (ModelState.IsValid)
             {
@@ -161,84 +158,64 @@ namespace CinemaWeb.Controllers.Admin
 
                 if (filmToUpdate == null) return NotFound();
 
-                if (filmToUpdate.Name != model.Name && CheckNameDuplication(model.Name))
-                {
-                    ModelState.AddModelError("Name", "Фільм з такою назвою вже існує!");
-                    await PopulateDropdowns(model);
-                    return View(model);
-                }
-
                 filmToUpdate.Name = model.Name;
                 filmToUpdate.Description = model.Description;
                 filmToUpdate.ReleaseDate = model.ReleaseDate;
                 filmToUpdate.DurationMinutes = model.DurationMinutes;
                 filmToUpdate.AllowedMinAge = model.AllowedMinAge;
-                filmToUpdate.PosterUrl = model.PosterUrl;
                 filmToUpdate.TrailerUrl = model.TrailerUrl;
                 filmToUpdate.ProducerId = model.ProducerId;
 
+                if (model.PosterFile != null)
+                {
+                    filmToUpdate.PosterUrl = await SaveImageAsync(model.PosterFile);
+                }
                 filmToUpdate.FilmGenres.Clear();
-                foreach (var genreId in model.SelectedGenreIds)
-                {
-                    filmToUpdate.FilmGenres.Add(new FilmGenre { FilmId = id, GenreId = genreId });
-                }
-
                 filmToUpdate.FilmActors.Clear();
-                foreach (var actorId in model.SelectedActorIds)
-                {
-                    filmToUpdate.FilmActors.Add(new FilmActor { FilmId = id, ActorId = actorId, CharacterName = "Updated" });
-                }
-
                 filmToUpdate.FilmCompanies.Clear();
-                foreach (var companyId in model.SelectedCompanyIds)
-                {
-                    filmToUpdate.FilmCompanies.Add(new FilmCompany { FilmId = id, CompanyId = companyId });
-                }
+                await _context.SaveChangesAsync();
 
-                try
-                {
-                    await _context.SaveChangesAsync();
-                }
-                catch (DbUpdateConcurrencyException)
-                {
-                    if (!FilmExists(filmToUpdate.Id)) return NotFound();
-                    else throw;
-                }
+                await UpdateRelations(id, model);
 
+                TempData["SuccessMessage"] = "Film updated successfully!";
                 return RedirectToAction(nameof(Index));
             }
 
             await PopulateDropdowns(model);
             return View(model);
         }
-
-        // POST: AdminFilms/Delete/5
-        [HttpPost, ActionName("Delete")]
-        [ValidateAntiForgeryToken]
-        public async Task<IActionResult> DeleteConfirmed(int id)
+        private async Task<string> SaveImageAsync(IFormFile file)
         {
-            var film = await _context.Films.FindAsync(id);
-            if (film != null)
+            string uploadsFolder = Path.Combine(_webHostEnvironment.WebRootPath, "uploads");
+            if (!Directory.Exists(uploadsFolder))
             {
-                var hasSessions = await _context.Sessions.AnyAsync(s => s.FilmId == id);
-                if (hasSessions)
-                {
-                    TempData["ErrorMessage"] = "Cannot delete film because it has related sessions.";
-                    return RedirectToAction(nameof(Index));
-                }
-
-                var ratings = _context.FilmRatings.Where(r => r.FilmId == id);
-                _context.FilmRatings.RemoveRange(ratings);
-
-                _context.Films.Remove(film);
-                await _context.SaveChangesAsync();
-                TempData["SuccessMessage"] = "Film deleted successfully.";
+                Directory.CreateDirectory(uploadsFolder);
             }
-            else
+
+            string uniqueFileName = Guid.NewGuid().ToString() + "_" + file.FileName;
+
+            string filePath = Path.Combine(uploadsFolder, uniqueFileName);
+
+            using (var fileStream = new FileStream(filePath, FileMode.Create))
             {
-                TempData["ErrorMessage"] = "Film not found.";
+                await file.CopyToAsync(fileStream);
             }
-            return RedirectToAction(nameof(Index));
+
+            return "/uploads/" + uniqueFileName;
+        }
+
+        private async Task UpdateRelations(int filmId, FilmFormViewModel model)
+        {
+            if (model.SelectedGenreIds != null)
+                foreach (var id in model.SelectedGenreIds) _context.FilmGenres.Add(new FilmGenre { FilmId = filmId, GenreId = id });
+
+            if (model.SelectedActorIds != null)
+                foreach (var id in model.SelectedActorIds) _context.FilmActors.Add(new FilmActor { FilmId = filmId, ActorId = id, CharacterName = "TBD" });
+
+            if (model.SelectedCompanyIds != null)
+                foreach (var id in model.SelectedCompanyIds) _context.FilmCompanies.Add(new FilmCompany { FilmId = filmId, CompanyId = id } as dynamic); // cast workaround or specific logic
+
+            await _context.SaveChangesAsync();
         }
 
         private async Task PopulateDropdowns(FilmFormViewModel model)
@@ -254,9 +231,51 @@ namespace CinemaWeb.Controllers.Admin
             return _context.Films.Any(f => f.Name == name);
         }
 
-        private bool FilmExists(int id)
+        [HttpPost, ActionName("Delete")]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> DeleteConfirmed(int id)
         {
-            return _context.Films.Any(e => e.Id == id);
+            var film = await _context.Films.FindAsync(id);
+            if (film != null)
+            {
+
+                var hasSessions = await _context.Sessions.AnyAsync(s => s.FilmId == id);
+                if (hasSessions)
+                {
+                    TempData["ErrorMessage"] = "Cannot delete film because it has related sessions.";
+                    return RedirectToAction(nameof(Index));
+                }
+
+                var ratings = _context.FilmRatings.Where(r => r.FilmId == id);
+                _context.FilmRatings.RemoveRange(ratings);
+
+                if (!string.IsNullOrEmpty(film.PosterUrl) && !film.PosterUrl.StartsWith("http"))
+                {
+                    string filePath = Path.Combine(_webHostEnvironment.WebRootPath, film.PosterUrl.TrimStart('/'));
+
+                    if (System.IO.File.Exists(filePath))
+                    {
+                        try
+                        {
+                            System.IO.File.Delete(filePath);
+                        }
+                        catch (Exception ex)
+                        {
+
+                            Console.WriteLine($"Could not delete file: {ex.Message}");
+                        }
+                    }
+                }
+                _context.Films.Remove(film);
+                await _context.SaveChangesAsync();
+
+                TempData["SuccessMessage"] = "Film deleted successfully.";
+            }
+            else
+            {
+                TempData["ErrorMessage"] = "Film not found.";
+            }
+            return RedirectToAction(nameof(Index));
         }
     }
 }
