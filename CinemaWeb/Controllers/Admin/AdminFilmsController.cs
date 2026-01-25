@@ -23,7 +23,7 @@ namespace CinemaWeb.Controllers.Admin
             var films = await _context.Films
                 .Include(f => f.Producer)
                 .Include(f => f.FilmGenres).ThenInclude(fg => fg.Genre)
-                .OrderByDescending(f => f.Id) // Свіжі зверху
+                .OrderByDescending(f => f.Id)
                 .ToListAsync();
             return View(films);
         }
@@ -60,7 +60,7 @@ namespace CinemaWeb.Controllers.Admin
         {
             if (CheckNameDuplication(model.Name))
             {
-                ModelState.AddModelError("Name", "Фільм з такою назвою вже існує!");
+                ModelState.AddModelError("Name", "A film with that name already exists!");
             }
 
             if (ModelState.IsValid)

@@ -32,7 +32,6 @@
             <thead class="table-dark">
                 <tr>
                     <th>Title</th>
-                    <th>Producer</th>
                     <th>Release Date</th>
                     <th>Duration</th>
                     <th>Age</th>
@@ -45,9 +44,6 @@
                 {
                     <tr>
                         <td class="fw-bold">@item.Name</td>
-                        <td>
-                            @(item.Producer?.Name ?? "-")
-                        </td>
                         <td>
                             @item.ReleaseDate?.ToShortDateString()
                         </td>
