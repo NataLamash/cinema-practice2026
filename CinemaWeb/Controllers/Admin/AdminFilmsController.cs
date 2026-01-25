@@ -1,5 +1,5 @@
 using CinemaDomain.Model;
-using CinemaInfrastructure; // adjust namespace to your project
+using CinemaInfrastructure;
 using CinemaWeb.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
@@ -65,7 +65,6 @@ namespace CinemaWeb.Controllers.Admin
 
             if (ModelState.IsValid)
             {
-                // 1. Мапінг ViewModel -> Domain Model
                 var film = new Film
                 {
                     Name = model.Name,
@@ -79,9 +78,8 @@ namespace CinemaWeb.Controllers.Admin
                 };
 
                 _context.Films.Add(film);
-                await _context.SaveChangesAsync(); // Отримуємо ID фільму
+                await _context.SaveChangesAsync();
 
-                // 2. Збереження зв'язків Many-to-Many
                 if (model.SelectedGenreIds.Any())
                 {
                     foreach (var genreId in model.SelectedGenreIds)
@@ -94,7 +92,6 @@ namespace CinemaWeb.Controllers.Admin
                 {
                     foreach (var actorId in model.SelectedActorIds)
                     {
-                        // Примітка: CharacterName залишаємо пустим або можна додати поле у форму, але це складно для мультиселекту
                         _context.FilmActors.Add(new FilmActor { FilmId = film.Id, ActorId = actorId, CharacterName = "TBD" });
                     }
                 }
@@ -111,17 +108,14 @@ namespace CinemaWeb.Controllers.Admin
                 return RedirectToAction(nameof(Index));
             }
 
-            // Якщо помилка валідації - перезавантажуємо списки
             await PopulateDropdowns(model);
             return View(model);
         }
 
-        // GET: AdminFilms/Edit/5
         public async Task<IActionResult> Edit(int? id)
         {
             if (id == null) return NotFound();
 
-            // Завантажуємо фільм з усіма зв'язками, щоб заповнити форму
             var film = await _context.Films
                 .Include(f => f.FilmGenres)
                 .Include(f => f.FilmActors)
@@ -130,7 +124,6 @@ namespace CinemaWeb.Controllers.Admin
 
             if (film == null) return NotFound();
 
-            // Мапінг Domain -> ViewModel
             var viewModel = new FilmFormViewModel
             {
                 Id = film.Id,
@@ -142,7 +135,6 @@ namespace CinemaWeb.Controllers.Admin
                 PosterUrl = film.PosterUrl,
                 TrailerUrl = film.TrailerUrl,
                 ProducerId = film.ProducerId,
-                // Заповнюємо обрані ID
                 SelectedGenreIds = film.FilmGenres.Select(fg => fg.GenreId).ToList(),
                 SelectedActorIds = film.FilmActors.Select(fa => fa.ActorId).ToList(),
                 SelectedCompanyIds = film.FilmCompanies.Select(fc => fc.CompanyId).ToList()
@@ -169,7 +161,6 @@ namespace CinemaWeb.Controllers.Admin
 
                 if (filmToUpdate == null) return NotFound();
 
-                // Перевірка дублікатів імені (якщо ім'я змінилось)
                 if (filmToUpdate.Name != model.Name && CheckNameDuplication(model.Name))
                 {
                     ModelState.AddModelError("Name", "Фільм з такою назвою вже існує!");
@@ -177,7 +168,6 @@ namespace CinemaWeb.Controllers.Admin
                     return View(model);
                 }
 
-                // 1. Оновлення скалярних полів
                 filmToUpdate.Name = model.Name;
                 filmToUpdate.Description = model.Description;
                 filmToUpdate.ReleaseDate = model.ReleaseDate;
@@ -187,23 +177,18 @@ namespace CinemaWeb.Controllers.Admin
                 filmToUpdate.TrailerUrl = model.TrailerUrl;
                 filmToUpdate.ProducerId = model.ProducerId;
 
-                // 2. Оновлення зв'язків (Стратегія: видалити старі, додати нові. Можна оптимізувати, але це найнадійніше)
-
-                // Жанри
-                filmToUpdate.FilmGenres.Clear(); // EF Core відстежує це як видалення
+                filmToUpdate.FilmGenres.Clear();
                 foreach (var genreId in model.SelectedGenreIds)
                 {
                     filmToUpdate.FilmGenres.Add(new FilmGenre { FilmId = id, GenreId = genreId });
                 }
 
-                // Актори
                 filmToUpdate.FilmActors.Clear();
                 foreach (var actorId in model.SelectedActorIds)
                 {
                     filmToUpdate.FilmActors.Add(new FilmActor { FilmId = id, ActorId = actorId, CharacterName = "Updated" });
                 }
 
-                // Компанії
                 filmToUpdate.FilmCompanies.Clear();
                 foreach (var companyId in model.SelectedCompanyIds)
                 {
@@ -235,7 +220,6 @@ namespace CinemaWeb.Controllers.Admin
             var film = await _context.Films.FindAsync(id);
             if (film != null)
             {
-                // Перевірка на зв'язки (сеанси)
                 var hasSessions = await _context.Sessions.AnyAsync(s => s.FilmId == id);
                 if (hasSessions)
                 {
@@ -243,7 +227,6 @@ namespace CinemaWeb.Controllers.Admin
                     return RedirectToAction(nameof(Index));
                 }
 
-                // Видалення рейтингів
                 var ratings = _context.FilmRatings.Where(r => r.FilmId == id);
                 _context.FilmRatings.RemoveRange(ratings);
 
@@ -257,8 +240,6 @@ namespace CinemaWeb.Controllers.Admin
             }
             return RedirectToAction(nameof(Index));
         }
-
-        // --- Допоміжні методи ---
 
         private async Task PopulateDropdowns(FilmFormViewModel model)
         {

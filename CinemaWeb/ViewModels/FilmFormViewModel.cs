@@ -42,13 +42,13 @@ namespace CinemaWeb.ViewModels
         public int? ProducerId { get; set; }
 
         [Display(Name = "Companies")]
-        public List<int> SelectedCompanyIds { get; set; } = new List<int>();
+        public List<int>? SelectedCompanyIds { get; set; } = new List<int>();
 
         [Display(Name = "Genres")]
-        public List<int> SelectedGenreIds { get; set; } = new List<int>();
+        public List<int>? SelectedGenreIds { get; set; } = new List<int>();
 
         [Display(Name = "Actors")]
-        public List<int> SelectedActorIds { get; set; } = new List<int>();
+        public List<int>? SelectedActorIds { get; set; } = new List<int>();
 
         public IEnumerable<SelectListItem>? ProducersList { get; set; }
         public IEnumerable<SelectListItem>? CompaniesList { get; set; }
