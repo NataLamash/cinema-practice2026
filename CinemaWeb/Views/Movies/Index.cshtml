@@ -1,1 +1,125 @@
-﻿<h1>Movies</h1>
+@model CinemaWeb.ViewModels.ClientFilmViewModel
+
+@{
+    ViewData["Title"] = "Афіша";
+}
+
+<div class="container mt-5">
+
+    <div class="row mb-4">
+        <div class="col-md-6">
+            <form asp-action="Index" method="get" class="d-flex gap-2">
+                <input type="text" name="searchTerm" class="form-control"
+                       placeholder="Пошук фільму за назвою..." value="@Model.SearchTerm" />
+                <button type="submit" class="btn btn-primary">Знайти</button>
+                @if (!string.IsNullOrEmpty(Model.SearchTerm))
+                {
+                    <a asp-action="Index" class="btn btn-secondary">Скинути</a>
+                }
+            </form>
+        </div>
+    </div>
+
+    <div class="mb-3">
+        <span>Сортувати за: </span>
+
+        <a asp-action="Index"
+           asp-route-sortOrder=""
+           asp-route-searchTerm="@Model.SearchTerm"
+           class="btn btn-sm @(ViewData["CurrentSort"] == null ? "btn-primary" : "btn-outline-secondary")">
+            Датою
+        </a>
+
+        <a asp-action="Index"
+           asp-route-sortOrder="name"
+           asp-route-searchTerm="@Model.SearchTerm"
+           class="btn btn-sm @(ViewData["CurrentSort"] as string == "name" ? "btn-primary" : "btn-outline-secondary")">
+            Назвою
+        </a>
+    </div>
+
+    <section class="mb-5">
+        <h2 class="mb-3 border-bottom pb-2">Зараз у кіно (Актуальні)</h2>
+
+        @if (!Model.ActualFilms.Any())
+        {
+            <div class="alert alert-info">На жаль, актуальних сеансів на найближчий тиждень не знайдено.</div>
+        }
+        else
+        {
+            <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+                @foreach (var film in Model.ActualFilms)
+                {
+                    <div class="col">
+                        <div class="card h-100 shadow-sm">
+                            @if (!string.IsNullOrEmpty(film.PosterUrl))
+                            {
+                                <img src="@film.PosterUrl" class="card-img-top" alt="@film.Name"
+                                     style="height: 350px; object-fit: cover;">
+                            }
+                            else
+                            {
+                                <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 350px;">
+                                    <span>No Poster</span>
+                                </div>
+                            }
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title text-truncate" title="@film.Name">@film.Name</h5>
+                                <p class="card-text small text-muted">
+                                    Тривалість: @film.DurationMinutes хв
+                                </p>
+                                <a asp-controller="Movies" asp-action="Details" asp-route-id="@film.Id" class="btn btn-primary">
+                                    Детальніше
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </section>
+
+    <section>
+        <h2 class="mb-3 border-bottom pb-2">Скоро (Очікувані)</h2>
+
+        @if (!Model.ExpectedFilms.Any())
+        {
+            <p class="text-muted">Список очікуваних фільмів порожній.</p>
+        }
+        else
+        {
+            <div class="row row-cols-1 row-cols-md-3 row-cols-lg-4 g-4">
+                @foreach (var film in Model.ExpectedFilms)
+                {
+                    <div class="col">
+                        <div class="card h-100 border-0 bg-light">
+                            <div style="position: relative;">
+                                @if (!string.IsNullOrEmpty(film.PosterUrl))
+                                {
+                                    <img src="@film.PosterUrl" class="card-img-top" alt="@film.Name"
+                                         style="height: 350px; object-fit: cover; filter: grayscale(40%);">
+                                }
+                                else
+                                {
+                                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 350px;">
+                                        <span>No Poster</span>
+                                    </div>
+                                }
+                                <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">
+                                    @(film.ReleaseDate.HasValue? film.ReleaseDate.Value.ToString("dd.MM.yyyy") : "Скоро")
+                                </span>
+                            </div>
+
+                            <div class="card-body">
+                                <h5 class="card-title text-truncate">@film.Name</h5>
+                                <a asp-controller="Movies" asp-action="Details" asp-route-id="@film.Id" class="btn btn-primary">
+                                    Детальніше
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                }
+            </div>
+        }
+    </section>
+</div>

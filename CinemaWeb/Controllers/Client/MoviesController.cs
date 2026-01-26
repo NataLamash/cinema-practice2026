@@ -1,17 +1,99 @@
+using CinemaDomain.Model;
+using CinemaInfrastructure;
+using CinemaWeb.ViewModels;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
 
 namespace CinemaWeb.Controllers.Client
 {
     public class MoviesController : Controller
     {
-        public IActionResult Index()
+        private readonly CinemaDbContext _context;
+
+        public MoviesController(CinemaDbContext context)
         {
-            return View();
+            _context = context;
         }
 
-        public async Task<IActionResult> Details()
+        // GET: Movies
+        public async Task<IActionResult> Index(string searchTerm, string sortOrder)
         {
-            return View();
+            var today = DateTime.Now;
+            var nextWeek = today.AddDays(7);
+
+            var filmsQuery = _context.Films
+                .Include(f => f.Sessions)
+                .AsNoTracking();
+
+            if (!string.IsNullOrEmpty(searchTerm))
+            {
+                filmsQuery = filmsQuery.Where(f => f.Name.Contains(searchTerm));
+            }
+
+            var allFilms = await filmsQuery.ToListAsync();
+
+            var actualFilmsQuery = allFilms
+                .Where(f => f.Sessions != null &&
+                            f.Sessions.Any(s => s.StartTime >= today && s.StartTime <= nextWeek));
+
+            var expectedFilmsQuery = allFilms
+                .Where(f => f.ReleaseDate > today || f.Sessions == null || !f.Sessions.Any())
+                .Except(actualFilmsQuery);
+
+            switch (sortOrder)
+            {
+                case "name":
+                    actualFilmsQuery = actualFilmsQuery.OrderBy(f => f.Name);
+                    expectedFilmsQuery = expectedFilmsQuery.OrderBy(f => f.Name);
+                    break;
+
+                case "date_desc":
+                    actualFilmsQuery = actualFilmsQuery.OrderByDescending(f => f.ReleaseDate);
+                    expectedFilmsQuery = expectedFilmsQuery.OrderByDescending(f => f.ReleaseDate);
+                    break;
+
+                default:
+                    actualFilmsQuery = actualFilmsQuery.OrderByDescending(f => f.ReleaseDate);
+                    expectedFilmsQuery = expectedFilmsQuery.OrderByDescending(f => f.ReleaseDate);
+                    break;
+            }
+
+            ViewData["CurrentSort"] = sortOrder;
+            ViewData["CurrentSearch"] = searchTerm;
+
+            var viewModel = new ClientFilmViewModel
+            {
+                SearchTerm = searchTerm,
+                ActualFilms = actualFilmsQuery.ToList(),
+                ExpectedFilms = expectedFilmsQuery.ToList()
+            };
+
+            return View(viewModel);
+        }
+
+        // GET: Movies/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null)
+            {
+                return NotFound();
+            }
+
+            var film = await _context.Films
+                .Include(f => f.Producer)
+                .Include(f => f.FilmGenres).ThenInclude(fg => fg.Genre)
+                .Include(f => f.FilmActors).ThenInclude(fa => fa.Actor)
+                .Include(f => f.FilmCompanies).ThenInclude(fc => fc.Company)
+                .FirstOrDefaultAsync(m => m.Id == id);
+
+            if (film == null)
+            {
+                return NotFound();
+            }
+
+            return View(film);
         }
     }
+
 }
+
