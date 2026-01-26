@@ -40,7 +40,7 @@
                             <div class="btn-group" role="group">
                                 <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning">Редагувати</a>
 
-                                <form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('Ви впевнені, що хочете видалити цей сеанс? Це дію неможливо буде скасувати.')">
+<form asp-action="Delete" asp-route-id="@item.Id" method="post" class="d-inline" onsubmit="return confirm('Ви впевнені, що хочете видалити цей сеанс? Цю дію неможливо буде скасувати.')">
                                     @Html.AntiForgeryToken()
                                     <button type="submit" class="btn btn-sm btn-outline-danger ms-1">Видалити</button>
                                 </form>
