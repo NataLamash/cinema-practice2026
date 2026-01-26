@@ -1,5 +1,7 @@
-﻿using CinemaInfrastructure;
+using CinemaInfrastructure;
+using Microsoft.AspNetCore.Localization;
 using Microsoft.EntityFrameworkCore;
+using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -14,8 +16,19 @@ builder.Services.AddDbContext<CinemaDbContext>(options =>
             sqlOptions.EnableRetryOnFailure();
         })
 );
+builder.Services.AddHttpClient();
 
 var app = builder.Build();
+
+var defaultCulture = new CultureInfo("en-US");
+var localizationOptions = new RequestLocalizationOptions
+{
+    DefaultRequestCulture = new RequestCulture(defaultCulture),
+    SupportedCultures = new List<CultureInfo> { defaultCulture },
+    SupportedUICultures = new List<CultureInfo> { defaultCulture }
+};
+
+app.UseRequestLocalization(localizationOptions);
 
 if (!app.Environment.IsDevelopment())
 {
