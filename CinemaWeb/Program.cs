@@ -1,11 +1,16 @@
 using CinemaInfrastructure;
-using Microsoft.AspNetCore.Localization;
+using CinemaWeb.Services;
 using Microsoft.EntityFrameworkCore;
-using System.Globalization;
 
 var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllersWithViews();
+builder.Services.AddControllersWithViews()
+    .AddMvcOptions(options =>
+    {
+        options.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(_ => "Це поле є обов'язковим.");
+        options.ModelBindingMessageProvider.SetAttemptedValueIsInvalidAccessor((val, prop) => $"Значення '{val}' є некоректним.");
+    });
+
 builder.Services.AddAuthorization();
 
 builder.Services.AddDbContext<CinemaDbContext>(options =>
@@ -16,19 +21,12 @@ builder.Services.AddDbContext<CinemaDbContext>(options =>
             sqlOptions.EnableRetryOnFailure();
         })
 );
+
+builder.Services.AddScoped<ISessionService, SessionService>();
 builder.Services.AddHttpClient();
 
 var app = builder.Build();
 
-var defaultCulture = new CultureInfo("en-US");
-var localizationOptions = new RequestLocalizationOptions
-{
-    DefaultRequestCulture = new RequestCulture(defaultCulture),
-    SupportedCultures = new List<CultureInfo> { defaultCulture },
-    SupportedUICultures = new List<CultureInfo> { defaultCulture }
-};
-
-app.UseRequestLocalization(localizationOptions);
 
 if (!app.Environment.IsDevelopment())
 {
@@ -40,7 +38,6 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
-
 app.UseAuthorization();
 
 app.MapControllerRoute(
