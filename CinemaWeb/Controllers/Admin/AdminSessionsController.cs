@@ -1,19 +1,22 @@
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
-using CinemaWeb.ViewModels; 
-using CinemaDomain.Model;   
+using CinemaWeb.ViewModels;
+using CinemaDomain.Model;
 using CinemaInfrastructure;
+using CinemaWeb.Services; 
 
 namespace CinemaWeb.Controllers.Admin
 {
     public class AdminSessionsController : Controller
     {
         private readonly CinemaDbContext _context;
+        private readonly ISessionService _sessionService;
 
-        public AdminSessionsController(CinemaDbContext context)
+        public AdminSessionsController(CinemaDbContext context, ISessionService sessionService)
         {
             _context = context;
+            _sessionService = sessionService;
         }
 
         // GET: AdminSessions
@@ -37,8 +40,8 @@ namespace CinemaWeb.Controllers.Admin
 
             return View(new SessionViewModel
             {
-                StartTime = new DateTime(start.Year, start.Month, start.Day, start.Hour, start.Minute, 0),
-                EndTime = new DateTime(end.Year, end.Month, end.Day, end.Hour, end.Minute, 0)
+                StartTime = ClearSeconds(start),
+                EndTime = ClearSeconds(end)
             });
         }
 
@@ -46,24 +49,20 @@ namespace CinemaWeb.Controllers.Admin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(SessionViewModel model)
         {
-            model.StartTime = new DateTime(model.StartTime.Year, model.StartTime.Month, model.StartTime.Day, model.StartTime.Hour, model.StartTime.Minute, 0);
-            model.EndTime = new DateTime(model.EndTime.Year, model.EndTime.Month, model.EndTime.Day, model.EndTime.Hour, model.EndTime.Minute, 0);
-
-            await RunBusinessValidations(model);
+            model.StartTime = ClearSeconds(model.StartTime);
+            model.EndTime = ClearSeconds(model.EndTime);
 
             if (ModelState.IsValid)
             {
-                var session = new Session
+                var (isSuccess, errorMessage) = await _sessionService.ValidateSessionAsync(model);
+
+                if (isSuccess)
                 {
-                    FilmId = model.FilmId,
-                    HallId = model.HallId,
-                    StartTime = model.StartTime,
-                    EndTime = model.EndTime,
-                    BasePrice = model.BasePrice
-                };
-                _context.Sessions.Add(session);
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                    await _sessionService.CreateSessionAsync(model);
+                    return RedirectToAction(nameof(Index));
+                }
+
+                ModelState.AddModelError(string.Empty, errorMessage);
             }
 
             await PopulateListsAsync();
@@ -80,13 +79,14 @@ namespace CinemaWeb.Controllers.Admin
 
             var model = new SessionViewModel
             {
-                Id = session.Id, 
+                Id = session.Id,
                 FilmId = session.FilmId,
                 HallId = session.HallId,
                 StartTime = session.StartTime,
                 EndTime = session.EndTime,
                 BasePrice = session.BasePrice
             };
+
             await PopulateListsAsync();
             return View(model);
         }
@@ -97,21 +97,20 @@ namespace CinemaWeb.Controllers.Admin
         {
             if (id != model.Id) return NotFound();
 
-            await RunBusinessValidations(model);
+            model.StartTime = ClearSeconds(model.StartTime);
+            model.EndTime = ClearSeconds(model.EndTime);
 
             if (ModelState.IsValid)
             {
-                var session = await _context.Sessions.FindAsync(id);
-                if (session == null) return NotFound();
+                var (isSuccess, errorMessage) = await _sessionService.ValidateSessionAsync(model);
 
-                session.FilmId = model.FilmId;
-                session.HallId = model.HallId;
-                session.StartTime = model.StartTime;
-                session.EndTime = model.EndTime;
-                session.BasePrice = model.BasePrice;
+                if (isSuccess)
+                {
+                    await _sessionService.UpdateSessionAsync(model);
+                    return RedirectToAction(nameof(Index));
+                }
 
-                await _context.SaveChangesAsync();
-                return RedirectToAction(nameof(Index));
+                ModelState.AddModelError(string.Empty, errorMessage);
             }
 
             await PopulateListsAsync();
@@ -140,47 +139,13 @@ namespace CinemaWeb.Controllers.Admin
             return RedirectToAction(nameof(Index));
         }
 
-        private async Task RunBusinessValidations(SessionViewModel model)
-        {
-            if (!await _context.Films.AnyAsync(f => f.Id == model.FilmId))
-                ModelState.AddModelError("FilmId", "Обраний фільм не існує.");
-
-            if (!await _context.Halls.AnyAsync(h => h.Id == model.HallId))
-                ModelState.AddModelError("HallId", "Обраний зал не існує.");
-
-            if (model.EndTime <= model.StartTime)
-            {
-                ModelState.AddModelError("EndTime", "Час завершення має бути пізніше початку.");
-                return;
-            }
-
-            if ((model.EndTime - model.StartTime).TotalMinutes < 60)
-                ModelState.AddModelError("EndTime", "Сеанс не може тривати менше однієї години.");
-
-            if (model.StartTime.Hour < 8)
-                ModelState.AddModelError("StartTime", "Кінотеатр ще зачинений (відкриття о 08:00).");
-
-            if (model.EndTime.Date > model.StartTime.Date || (model.EndTime.Hour == 0 && model.EndTime.Minute > 0))
-                ModelState.AddModelError("EndTime", "Сеанс має закінчитися до опівночі.");
-
-            if (model.StartTime < DateTime.Now)
-                ModelState.AddModelError("StartTime", "Не можна створювати сеанси у минулому.");
-
-            int cleaningTime = 20;
-            bool hasOverlap = await _context.Sessions.AnyAsync(s =>
-                s.Id != model.Id && 
-                s.HallId == model.HallId &&
-                model.StartTime < s.EndTime.AddMinutes(cleaningTime) &&
-                model.EndTime.AddMinutes(cleaningTime) > s.StartTime);
-
-            if (hasOverlap)
-                ModelState.AddModelError(string.Empty, "У залі вже є сеанс або час на прибирання (20 хв).");
-        }
-
         private async Task PopulateListsAsync()
         {
             ViewBag.Films = new SelectList(await _context.Films.OrderBy(f => f.Name).ToListAsync(), "Id", "Name");
             ViewBag.Halls = new SelectList(await _context.Halls.OrderBy(h => h.Name).ToListAsync(), "Id", "Name");
         }
+
+        private DateTime ClearSeconds(DateTime dt)
+            => new DateTime(dt.Year, dt.Month, dt.Day, dt.Hour, dt.Minute, 0);
     }
 }

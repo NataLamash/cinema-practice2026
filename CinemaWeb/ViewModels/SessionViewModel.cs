@@ -9,11 +9,11 @@ namespace CinemaWeb.ViewModels
 
 		[Required(ErrorMessage = "Будь ласка, оберіть фільм із списку")]
 		[Display(Name = "Фільм")]
-		public int FilmId { get; set; }
+		public int? FilmId { get; set; }
 
 		[Required(ErrorMessage = "Будь ласка, оберіть зал")]
 		[Display(Name = "Кінозал")]
-		public int HallId { get; set; }
+		public int? HallId { get; set; }
 
 		[Required(ErrorMessage = "Вкажіть дату та час початку сеансу")]
 		[Display(Name = "Початок сеансу")]
@@ -26,7 +26,7 @@ namespace CinemaWeb.ViewModels
 		public DateTime EndTime { get; set; }
 
 		[Required(ErrorMessage = "Вкажіть базову вартість квитка")]
-		[Range(1.00, 10000, ErrorMessage = "Ціна повинна бути в межах від 1 до 10 000 грн")]
+		[Range(50, 10000, ErrorMessage = "Ціна повинна бути в межах від 50 до 10 000 грн")]
 		[Display(Name = "Базова ціна (грн)")]
 		public decimal BasePrice { get; set; }
 
