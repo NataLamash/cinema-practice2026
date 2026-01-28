@@ -1,6 +1,7 @@
 using CinemaInfrastructure;
 using CinemaWeb.Services;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.AspNetCore.Identity;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -10,6 +11,15 @@ builder.Services.AddControllersWithViews()
         options.ModelBindingMessageProvider.SetValueMustNotBeNullAccessor(_ => "Це поле є обов'язковим.");
         options.ModelBindingMessageProvider.SetAttemptedValueIsInvalidAccessor((val, prop) => $"Значення '{val}' є некоректним.");
     });
+
+builder.Services.AddRazorPages();
+
+builder.Services
+    .AddDefaultIdentity<IdentityUser>(OptionsBuilderConfigurationExtensions =>
+{
+    OptionsBuilderConfigurationExtensions.SignIn.RequireConfirmedAccount = false;
+})
+.AddEntityFrameworkStores<CinemaDbContext>();
 
 builder.Services.AddAuthorization();
 
@@ -38,10 +48,12 @@ app.UseHttpsRedirection();
 app.UseStaticFiles();
 
 app.UseRouting();
+app.UseAuthentication();
 app.UseAuthorization();
 
 app.MapControllerRoute(
     name: "default",
     pattern: "{controller=Home}/{action=Index}/{id?}");
 
+app.MapRazorPages();
 app.Run();
