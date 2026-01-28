@@ -1,88 +1,114 @@
 @model CinemaWeb.ViewModels.ClientFilmDetailsViewModel
-
 @{
     ViewData["Title"] = Model.Title;
 }
 
-<div class="container mt-5">
-    <a asp-action="Index" class="btn btn-outline-secondary mb-3">
-        <i class="bi bi-arrow-left"></i> Back to movies
-    </a>
+<div class="container mt-4">
+    <div class="card shadow">
+        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
+            <h2 class="mb-0">@Model.Title</h2>
+            <span class="badge bg-warning text-dark">Вік: @(Model.AllowedMinAge ?? 0)+</span> </div>
 
-    <div class="row">
-        <div class="col-md-4 mb-4">
-            @if (!string.IsNullOrEmpty(Model.PosterUrl))
-            {
-                <img src="@Model.PosterUrl" alt="@Model.Title" class="img-fluid rounded shadow w-100" style="object-fit: cover;" />
-            }
-            else
-            {
-                <div class="bg-light text-center py-5 rounded border">
-                    <span class="text-muted">No Poster</span>
-                </div>
-            }
-        </div>
-
-        <div class="col-md-8">
-            <h1 class="display-5 fw-bold">@Model.Title</h1>
-
-            <div class="mb-3">
-                <span class="badge bg-warning text-dark fs-6 me-2">@((Model.AllowedMinAge ?? 0))+</span>
-                <span class="text-muted"><i class="bi bi-clock"></i> @Model.DurationMinutes хв</span>
-                <span class="mx-2">|</span>
-                <span class="text-muted">@Model.ReleaseDate?.ToString("yyyy")</span>
-            </div>
-
-            @if (Model.Genres.Any())
-            {
-                <div class="mb-3">
-                    @foreach (var genre in Model.Genres)
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4 text-center">
+                    @if (!string.IsNullOrEmpty(Model.PosterUrl))
                     {
-                        <span class="badge bg-secondary me-1">@genre</span>
+                        <img src="@Model.PosterUrl" alt="@Model.Title" class="img-fluid rounded shadow-sm" style="max-height: 500px; object-fit: cover;" />
+                    }
+                    else
+                    {
+                        <div class="alert alert-secondary py-5">Постер недоступний</div>
                     }
                 </div>
-            }
 
-            <p class="lead mt-4">@Model.Description</p>
+                <div class="col-md-8">
+                    <dl class="row">
+                        <dt class="col-sm-3">Опис:</dt>
+                        <dd class="col-sm-9">
+                            @(string.IsNullOrEmpty(Model.Description) ? "Відсутні дані" : Model.Description)
+                        </dd>
 
-            <div class="row mt-4">
-                <div class="col-md-6">
-                    <strong>Producer:</strong> @Model.ProducerName
+                        <dt class="col-sm-3">Дата виходу:</dt>
+                        <dd class="col-sm-9">
+                            @(Model.ReleaseDate.HasValue
+                                                        ? Model.ReleaseDate.Value.ToString("MMMM d, yyyy")
+                                                        : "Відсутні дані")
+                        </dd>
+
+                        <dt class="col-sm-3">Тривалість:</dt>
+                        <dd class="col-sm-9">@Model.DurationMinutes хв.</dd>
+
+                        <dt class="col-sm-3">Продюсер:</dt>
+                        <dd class="col-sm-9">@(Model.ProducerName ?? "")</dd>
+
+                        <hr class="my-3" />
+
+                        <dt class="col-sm-3">Жанри:</dt>
+                        <dd class="col-sm-9">
+                            @if (Model.Genres.Any())
+                            {
+                                @foreach (var genre in Model.Genres)
+                                {
+                                    <span class="badge bg-secondary me-1">@genre</span>
+                                }
+                            }
+                            else
+                            {
+                                <span class="text-muted">Відсутні дані</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-3">Актори:</dt>
+                        <dd class="col-sm-9">
+                            @if (Model.Actors.Any())
+                            {
+                                <ul class="list-unstyled mb-0">
+                                    @foreach (var actor in Model.Actors)
+                                    {
+                                        <li>
+                                            <i class="bi bi-person-fill text-muted"></i> @actor
+                                        </li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Відсутні дані</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-3">Трейлер:</dt>
+                        <dd class="col-sm-9">
+                            @if (!string.IsNullOrEmpty(Model.TrailerEmbedUrl))
+                            {
+                                <div class="mt-3">
+                                    <div class="ratio ratio-16x9 shadow-sm rounded overflow-hidden">
+                                        <iframe src="@Model.TrailerEmbedUrl"
+                                                title="YouTube video player"
+                                                frameborder="0"
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                allowfullscreen>
+                                        </iframe>
+                                    </div>
+                                </div>
+                            }
+                            else if (!string.IsNullOrEmpty(Model.TrailerUrl))
+                            {
+                                <div class="mt-3">
+                                    <a href="@Model.TrailerUrl" target="_blank" class="btn btn-danger w-100">
+                                        <i class="bi bi-youtube"></i> Дивитися трейлер
+                                    </a>
+                                </div>
+                            }
+                        </dd>
+                    </dl>
                 </div>
-                @if (Model.Actors.Any())
-                {
-                    <div class="col-md-12 mt-2">
-                        <strong>Cast:</strong> @string.Join(", ", Model.Actors)
-                    </div>
-                }
             </div>
+        </div>
 
-            @if (!string.IsNullOrEmpty(Model.TrailerEmbedUrl))
-            {
-                <div class="mt-5">
-                    <h3>Trailer</h3>
-                    <div class="ratio ratio-16x9 shadow rounded overflow-hidden">
-                        <iframe src="@Model.TrailerEmbedUrl"
-                                title="YouTube video player"
-                                frameborder="0"
-                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-                                allowfullscreen>
-                        </iframe>
-                    </div>
-                </div>
-            }
-            else if (!string.IsNullOrEmpty(Model.TrailerUrl))
-            {
-                <div class="mt-4">
-                    <a href="@Model.TrailerUrl" target="_blank" class="btn btn-danger">
-                        <i class="bi bi-youtube"></i> Watch on YouTube
-                    </a>
-                </div>
-            }
-
-            <div class="mt-5 p-4 bg-light rounded">
-                <h4 class="text-muted">Sessions coming soon...</h4>
-            </div>
+        <div class="card-footer text-end">
+            <a asp-action="Index" class="btn btn-outline-secondary">Назад до фільмів</a>
         </div>
     </div>
 </div>
