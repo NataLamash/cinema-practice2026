@@ -1,21 +1,23 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 using CinemaDomain.Model;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 
 namespace CinemaInfrastructure
 {
-    public class CinemaDbContext : DbContext
+    public class CinemaDbContext : IdentityDbContext<IdentityUser>
     {
         public CinemaDbContext(DbContextOptions<CinemaDbContext> options)
         : base(options)
         {
         }
 
-        public DbSet<User> Users { get; set; }
+        public DbSet<User> AppUsers { get; set; }
         public DbSet<Order> Orders { get; set; }
         public DbSet<OrderStatus> OrderStatuses { get; set; }
         public DbSet<Ticket> Tickets { get; set; }
