@@ -2,9 +2,9 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 
-namespace CinemaWeb.ViewModels // Або твій namespace
+namespace CinemaWeb.ViewModels
 {
-    public class ClientFilmDetailsViewModel
+    public class AdminFilmDetailsViewModel
     {
         public int Id { get; set; }
         public string Title { get; set; }
@@ -19,6 +19,7 @@ namespace CinemaWeb.ViewModels // Або твій namespace
         public List<string> Genres { get; set; } = new List<string>();
         public List<string> Actors { get; set; } = new List<string>();
         public List<string> Companies { get; set; } = new List<string>();
+
 
         //parse trailer url to embed url for the youtube
         public string TrailerEmbedUrl

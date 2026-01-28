@@ -41,6 +41,21 @@ namespace CinemaWeb.Controllers.Admin
                 .Include(f => f.FilmGenres).ThenInclude(fg => fg.Genre)
                 .Include(f => f.FilmActors).ThenInclude(fa => fa.Actor)
                 .Include(f => f.FilmCompanies).ThenInclude(fc => fc.Company)
+                .Select(f => new AdminFilmDetailsViewModel
+                {
+                    Id = f.Id,
+                    Title = f.Name,
+                    Description = f.Description,
+                    DurationMinutes = f.DurationMinutes,
+                    AllowedMinAge = f.AllowedMinAge,
+                    PosterUrl = f.PosterUrl,
+                    TrailerUrl = f.TrailerUrl,
+                    ReleaseDate = f.ReleaseDate,
+                    ProducerName = f.Producer.Name,
+                    Genres = f.FilmGenres.Select(g => g.Genre.Name).ToList(),
+                    Actors = f.FilmActors.Select(a => a.Actor.Name).ToList(),
+                    Companies = f.FilmCompanies.Select(c => c.Company.Name).ToList()
+                })
                 .FirstOrDefaultAsync(m => m.Id == id);
 
             if (film == null)
@@ -93,7 +108,7 @@ namespace CinemaWeb.Controllers.Admin
 
                 await UpdateRelations(film.Id, model);
 
-                TempData["SuccessMessage"] = "Film created successfully!";
+                TempData["SuccessMessage"] = "Фільм створено успішно!";
                 return RedirectToAction(nameof(Index));
             }
 

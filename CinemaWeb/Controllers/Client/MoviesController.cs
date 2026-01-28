@@ -78,6 +78,7 @@ namespace CinemaWeb.Controllers.Client
                 .Include(f => f.Producer)
                 .Include(f => f.FilmGenres).ThenInclude(fg => fg.Genre)
                 .Include(f => f.FilmActors).ThenInclude(fa => fa.Actor)
+                .Include(f => f.FilmCompanies).ThenInclude(fc => fc.Company)
                 .FirstOrDefaultAsync(f => f.Id == id);
 
             if (film == null)
@@ -95,9 +96,10 @@ namespace CinemaWeb.Controllers.Client
                 PosterUrl = film.PosterUrl,
                 TrailerUrl = film.TrailerUrl,
                 ReleaseDate = film.ReleaseDate,
-                ProducerName = film.Producer?.Name ?? "Невідомий",
+                ProducerName = film.Producer?.Name,
                 Genres = film.FilmGenres.Select(fg => fg.Genre.Name).ToList(),
-                Actors = film.FilmActors.Select(fa => fa.Actor.Name).ToList()
+                Actors = film.FilmActors.Select(fa => fa.Actor.Name).ToList(),
+                Companies = film.FilmCompanies.Select(fc => fc.Company.Name).ToList()
             };
 
             return View(viewModel);

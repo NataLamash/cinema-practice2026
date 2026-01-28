@@ -7,7 +7,7 @@
     <div class="card shadow">
         <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
             <h2 class="mb-0">@Model.Title</h2>
-            <span class="badge bg-warning text-dark">Вік: @(Model.AllowedMinAge ?? 0)+</span> </div>
+            <span class="badge bg-warning text-dark">@(Model.AllowedMinAge ?? 0)+</span> </div>
 
         <div class="card-body">
             <div class="row">
@@ -26,21 +26,21 @@
                     <dl class="row">
                         <dt class="col-sm-3">Опис:</dt>
                         <dd class="col-sm-9">
-                            @(string.IsNullOrEmpty(Model.Description) ? "Відсутні дані" : Model.Description)
+                            @(string.IsNullOrEmpty(Model.Description) ? "Дані відсутні" : Model.Description)
                         </dd>
 
                         <dt class="col-sm-3">Дата виходу:</dt>
                         <dd class="col-sm-9">
                             @(Model.ReleaseDate.HasValue
-                                                        ? Model.ReleaseDate.Value.ToString("MMMM d, yyyy")
-                                                        : "Відсутні дані")
+                                                        ? Model.ReleaseDate.Value.ToString("d MMMM, yyyy")
+                                                        : "Дані відсутні")
                         </dd>
 
                         <dt class="col-sm-3">Тривалість:</dt>
                         <dd class="col-sm-9">@Model.DurationMinutes хв.</dd>
 
                         <dt class="col-sm-3">Продюсер:</dt>
-                        <dd class="col-sm-9">@(Model.ProducerName ?? "")</dd>
+                        <dd class="col-sm-9">@(Model.ProducerName ?? "Дані відсутні")</dd>
 
                         <hr class="my-3" />
 
@@ -55,7 +55,7 @@
                             }
                             else
                             {
-                                <span class="text-muted">Відсутні дані</span>
+                                <span class="text-muted">Дані відсутні</span>
                             }
                         </dd>
 
@@ -74,7 +74,25 @@
                             }
                             else
                             {
-                                <span class="text-muted">Відсутні дані</span>
+                                <span class="text-muted">Дані відсутні</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-3">Виробники:</dt>
+                        <dd class="col-sm-9">
+                            @if (Model.Companies.Any())
+                            {
+                                <ul class="list-unstyled mb-0">
+                                    @foreach (var company in Model.Companies)
+                                    {
+                                        <li>@company</li>
+                                    }
+                                </ul>
+                            }
+                            else
+                            {
+
+                                <span class="text-muted">Дані відсутні</span>
                             }
                         </dd>
 
@@ -100,6 +118,10 @@
                                         <i class="bi bi-youtube"></i> Дивитися трейлер
                                     </a>
                                 </div>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Дані відсутні</span>
                             }
                         </dd>
                     </dl>
