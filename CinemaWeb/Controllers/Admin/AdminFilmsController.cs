@@ -1,6 +1,7 @@
 using CinemaDomain.Model;
 using CinemaInfrastructure;
 using CinemaWeb.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
@@ -9,6 +10,7 @@ using System.Net;
 
 namespace CinemaWeb.Controllers.Admin
 {
+    [Authorize(Roles = "Admin")]
     public class AdminFilmsController : Controller
     {
         private readonly CinemaDbContext _context;

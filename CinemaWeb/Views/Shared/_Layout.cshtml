@@ -38,17 +38,20 @@
                             <a class="nav-link text-dark" asp-controller="Sessions" asp-action="Index">Sessions</a>
                         </li>
 
-                        <li class="nav-item">
-                            <span class="nav-link text-muted">|</span>
-                        </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link text-danger" asp-controller="AdminFilms" asp-action="Index">Admin Films</a>
-                        </li>
+                        @if (User.IsInRole("Admin"))
+                        {
+                            <li class="nav-item">
+                                <span class="nav-link text-muted">|</span>
+                            </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-danger" asp-controller="AdminFilms" asp-action="Index">Admin Films</a>
+                            </li>
 
-                        <li class="nav-item">
-                            <a class="nav-link text-danger" asp-controller="AdminSessions" asp-action="Index">Admin Sessions</a>
-                        </li>
+                            <li class="nav-item">
+                                <a class="nav-link text-danger" asp-controller="AdminSessions" asp-action="Index">Admin Sessions</a>
+                            </li>
+                        }
 
                         <partial name="_LoginPartial" />
                     </ul>
