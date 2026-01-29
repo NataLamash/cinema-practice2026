@@ -20,6 +20,8 @@ namespace CinemaWeb.ViewModels // Або твій namespace
         public List<string> Actors { get; set; } = new List<string>();
         public List<string> Companies { get; set; } = new List<string>();
 
+        public List<ClientSessionDto> UpcomingSessions { get; set; } = new List<ClientSessionDto>();
+
         //parse trailer url to embed url for the youtube
         public string TrailerEmbedUrl
         {
@@ -41,5 +43,13 @@ namespace CinemaWeb.ViewModels // Або твій namespace
                     : null;
             }
         }
+    }
+
+    public class ClientSessionDto
+    {
+        public int SessionId { get; set; }
+        public DateTime StartTime { get; set; }
+        public string HallName { get; set; }
+        public decimal BasePrice { get; set; }
     }
 }

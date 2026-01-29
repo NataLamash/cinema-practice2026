@@ -81,6 +81,23 @@ namespace CinemaWeb.Controllers.Client
                 .Include(f => f.FilmCompanies).ThenInclude(fc => fc.Company)
                 .FirstOrDefaultAsync(f => f.Id == id);
 
+            var now = DateTime.Now;
+            var nextWeek = now.AddDays(7);
+
+            var sessions = await _context.Sessions
+                .Include(s => s.Hall)
+                .Where(s => s.FilmId == id && s.StartTime >= now && s.StartTime <= nextWeek)
+                .OrderBy(s => s.StartTime)
+                .Take(5)
+                .Select(s => new ClientSessionDto
+                {
+                    SessionId = s.Id,
+                    StartTime = s.StartTime,
+                    HallName = s.Hall.Name,
+                    BasePrice = s.BasePrice
+                })
+                .ToListAsync();
+
             if (film == null)
             {
                 return NotFound();
@@ -99,7 +116,8 @@ namespace CinemaWeb.Controllers.Client
                 ProducerName = film.Producer?.Name,
                 Genres = film.FilmGenres.Select(fg => fg.Genre.Name).ToList(),
                 Actors = film.FilmActors.Select(fa => fa.Actor.Name).ToList(),
-                Companies = film.FilmCompanies.Select(fc => fc.Company.Name).ToList()
+                Companies = film.FilmCompanies.Select(fc => fc.Company.Name).ToList(),
+                UpcomingSessions = sessions
             };
 
             return View(viewModel);
