@@ -1,13 +1,15 @@
-using Microsoft.AspNetCore.Mvc;
-using Microsoft.AspNetCore.Mvc.Rendering;
-using Microsoft.EntityFrameworkCore;
-using CinemaWeb.ViewModels;
 using CinemaDomain.Model;
 using CinemaInfrastructure;
 using CinemaWeb.Services; 
+using CinemaWeb.ViewModels;
+using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
+using Microsoft.EntityFrameworkCore;
 
 namespace CinemaWeb.Controllers.Admin
 {
+    [Authorize(Roles = "Admin")]
     public class AdminSessionsController : Controller
     {
         private readonly CinemaDbContext _context;
