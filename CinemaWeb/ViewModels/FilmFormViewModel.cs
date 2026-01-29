@@ -8,48 +8,50 @@ namespace CinemaWeb.ViewModels
     {
         public int Id { get; set; }
 
-        [Required(ErrorMessage = "Film title is required")]
-        [Display(Name = "Title")]
+        [Required(ErrorMessage = "Це обов'язкове поле.")]
+        [Display(Name = "Назва")]
+        [StringLength(50, MinimumLength = 2, ErrorMessage = "Назва має містити від 2 до 50 символів.")]
         public string Name { get; set; } = string.Empty;
 
-        [Display(Name = "Description")]
+        [Display(Name = "Опис")]
+        [StringLength(500, MinimumLength = 2, ErrorMessage = "Опис має містити від 2 до 500 символів.")]
         public string? Description { get; set; }
 
-        [Display(Name = "Release Date")]
+        [Display(Name = "Дата виходу")]
         [DataType(DataType.Date)]
         public DateTime? ReleaseDate { get; set; }
 
-        [Required(ErrorMessage = "Duration is required")]
-        [Range(1, 1000, ErrorMessage = "Duration must be greater than 0")]
-        [Display(Name = "Duration (min)")]
+        [Required(ErrorMessage = "Це обов'язкове поле.")]
+        [Range(1, 1000, ErrorMessage = "Тривалість має перевищувати 0.")]
+        [Display(Name = "Тривалість (хв)")]
         public short DurationMinutes { get; set; }
 
-        [Range(0, 21, ErrorMessage = "Age must be between 0 and 21")]
-        [Display(Name = "Min Age")]
+        [Range(0, 21, ErrorMessage = "Вік має бути від 0 до 21.")]
+        [Display(Name = "Вікове обмеження")]
         public byte? AllowedMinAge { get; set; }
 
-        [Url(ErrorMessage = "Invalid URL format")]
-        [Display(Name = "Poster URL")]
+        [Url(ErrorMessage = "Хибний формат URL")]
+        [Display(Name = "URL постера")]
         public string? PosterUrl { get; set; }
 
-        [Display(Name = "Download poster")]
+        [Display(Name = "Завантажити постер")]
         public IFormFile? PosterFile { get; set; }
 
-        [Url(ErrorMessage = "Invalid URL format")]
-        [Display(Name = "Trailer URL")]
+        [Url(ErrorMessage = "Хибний формат URL")]
+        [Display(Name = "URL трейлера")]
         public string? TrailerUrl { get; set; }
 
 
-        [Display(Name = "Producer")]
+        [Display(Name = "Продюсер")]
         public int? ProducerId { get; set; }
 
-        [Display(Name = "Companies")]
+        [Display(Name = "Компанії")]
         public List<int>? SelectedCompanyIds { get; set; } = new List<int>();
 
-        [Display(Name = "Genres")]
+        [Display(Name = "Жанри")]
         public List<int>? SelectedGenreIds { get; set; } = new List<int>();
 
-        [Display(Name = "Actors")]
+        [Display(Name = "Актори")]
         public List<int>? SelectedActorIds { get; set; } = new List<int>();
 
         public IEnumerable<SelectListItem>? ProducersList { get; set; }
