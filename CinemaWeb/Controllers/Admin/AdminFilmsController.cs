@@ -4,6 +4,8 @@ using CinemaWeb.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
+using System;
+using System.Net;
 
 namespace CinemaWeb.Controllers.Admin
 {
@@ -62,10 +64,7 @@ namespace CinemaWeb.Controllers.Admin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(FilmFormViewModel model)
         {
-            if (CheckNameDuplication(model.Name))
-            {
-                ModelState.AddModelError("Name", "Фільм з такою назвою вже існує!");
-            }
+            RunChecks(model);
 
             if (ModelState.IsValid)
             {
@@ -148,6 +147,8 @@ namespace CinemaWeb.Controllers.Admin
             ModelState.Remove(nameof(model.SelectedCompanyIds));
             ModelState.Remove(nameof(model.PosterUrl));
 
+            RunChecks(model);
+
             if (ModelState.IsValid)
             {
                 var filmToUpdate = await _context.Films
@@ -226,9 +227,53 @@ namespace CinemaWeb.Controllers.Admin
             model.CompaniesList = new SelectList(await _context.Companies.ToListAsync(), "Id", "Name");
         }
 
+        private void RunChecks(FilmFormViewModel model)
+        {
+            if (CheckNameDuplication(model.Name))
+            {
+                ModelState.AddModelError("Name", "Фільм з такою назвою вже існує.");
+            }
+            if (!string.IsNullOrEmpty(model.TrailerUrl) && !UrlIsYouTubeVideo(model.TrailerUrl))
+            {
+                ModelState.AddModelError("TrailerUrl", "Посилання має скеровувати на YouTube-відео.");
+            }
+        }
+
         private bool CheckNameDuplication(string name)
         {
             return _context.Films.Any(f => f.Name == name);
+        }
+
+        public bool UrlIsYouTubeVideo(string url)
+        {
+            try
+            {
+                var request = WebRequest.Create(url);
+                request.Timeout = 5000;
+                request.Method = "HEAD";
+
+                using (var response = (HttpWebResponse)request.GetResponse())
+                {
+                    if (response.StatusCode != HttpStatusCode.OK) return false;
+
+                    Uri finalUri = response.ResponseUri;
+                    string host = finalUri.Host.ToLower();
+
+                    if (!host.EndsWith("youtube.com") && !host.EndsWith("youtu.be"))
+                        return false;
+
+                    bool isStandardVideo = finalUri.AbsolutePath.Equals("/watch", StringComparison.OrdinalIgnoreCase)
+                                           && finalUri.Query.Contains("v=");
+
+                    bool isShorts = finalUri.AbsolutePath.StartsWith("/shorts/", StringComparison.OrdinalIgnoreCase);
+
+                    return isStandardVideo || isShorts;
+                }
+            }
+            catch
+            {
+                return false;
+            }
         }
 
         [HttpPost, ActionName("Delete")]
