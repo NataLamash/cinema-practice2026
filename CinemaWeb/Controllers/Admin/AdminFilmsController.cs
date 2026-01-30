@@ -68,14 +68,14 @@ namespace CinemaWeb.Controllers.Admin
 
         public async Task<IActionResult> Create()
         {
-            var viewModel = new AdminFilmFormViewModel();
+            var viewModel = new FilmFormViewModel();
             await PopulateDropdowns(viewModel);
             return View(viewModel);
         }
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Create(AdminFilmFormViewModel model)
+        public async Task<IActionResult> Create(FilmFormViewModel model)
         {
             if (CheckNameDuplication(model.Name))
             {
@@ -128,7 +128,7 @@ namespace CinemaWeb.Controllers.Admin
 
             if (film == null) return NotFound();
 
-            var viewModel = new AdminFilmFormViewModel
+            var viewModel = new FilmFormViewModel
             {
                 Id = film.Id,
                 Name = film.Name,
@@ -150,7 +150,7 @@ namespace CinemaWeb.Controllers.Admin
 
         [HttpPost]
         [ValidateAntiForgeryToken]
-        public async Task<IActionResult> Edit(int id, AdminFilmFormViewModel model)
+        public async Task<IActionResult> Edit(int id, FilmFormViewModel model)
         {
             if (id != model.Id) return NotFound();
 
@@ -219,7 +219,7 @@ namespace CinemaWeb.Controllers.Admin
             return "/uploads/" + uniqueFileName;
         }
 
-        private async Task UpdateRelations(int filmId, AdminFilmFormViewModel model)
+        private async Task UpdateRelations(int filmId, FilmFormViewModel model)
         {
             if (model.SelectedGenreIds != null)
                 foreach (var id in model.SelectedGenreIds) _context.FilmGenres.Add(new FilmGenre { FilmId = filmId, GenreId = id });
@@ -233,7 +233,7 @@ namespace CinemaWeb.Controllers.Admin
             await _context.SaveChangesAsync();
         }
 
-        private async Task PopulateDropdowns(AdminFilmFormViewModel model)
+        private async Task PopulateDropdowns(FilmFormViewModel model)
         {
             model.ProducersList = new SelectList(await _context.Producers.ToListAsync(), "Id", "Name");
             model.GenresList = new SelectList(await _context.Genres.ToListAsync(), "Id", "Name");
