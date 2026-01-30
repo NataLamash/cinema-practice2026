@@ -72,26 +72,55 @@ namespace CinemaWeb.Controllers.Client
         }
 
         // GET: Movies/Details/5
-        public async Task<IActionResult> Details(int? id)
+        public async Task<IActionResult> Details(int id)
         {
-            if (id == null)
-            {
-                return NotFound();
-            }
-
             var film = await _context.Films
                 .Include(f => f.Producer)
                 .Include(f => f.FilmGenres).ThenInclude(fg => fg.Genre)
                 .Include(f => f.FilmActors).ThenInclude(fa => fa.Actor)
                 .Include(f => f.FilmCompanies).ThenInclude(fc => fc.Company)
-                .FirstOrDefaultAsync(m => m.Id == id);
+                .FirstOrDefaultAsync(f => f.Id == id);
+
+            var now = DateTime.Now;
+            var nextWeek = now.AddDays(7);
+
+            var sessions = await _context.Sessions
+                .Include(s => s.Hall)
+                .Where(s => s.FilmId == id && s.StartTime >= now && s.StartTime <= nextWeek)
+                .OrderBy(s => s.StartTime)
+                .Take(5)
+                .Select(s => new ClientSessionDto
+                {
+                    SessionId = s.Id,
+                    StartTime = s.StartTime,
+                    HallName = s.Hall.Name,
+                    BasePrice = s.BasePrice
+                })
+                .ToListAsync();
 
             if (film == null)
             {
                 return NotFound();
             }
 
-            return View(film);
+            var viewModel = new ClientFilmDetailsViewModel
+            {
+                Id = film.Id,
+                Title = film.Name,
+                Description = film.Description,
+                DurationMinutes = film.DurationMinutes,
+                AllowedMinAge = film.AllowedMinAge,
+                PosterUrl = film.PosterUrl,
+                TrailerUrl = film.TrailerUrl,
+                ReleaseDate = film.ReleaseDate,
+                ProducerName = film.Producer?.Name,
+                Genres = film.FilmGenres.Select(fg => fg.Genre.Name).ToList(),
+                Actors = film.FilmActors.Select(fa => fa.Actor.Name).ToList(),
+                Companies = film.FilmCompanies.Select(fc => fc.Company.Name).ToList(),
+                UpcomingSessions = sessions
+            };
+
+            return View(viewModel);
         }
     }
 

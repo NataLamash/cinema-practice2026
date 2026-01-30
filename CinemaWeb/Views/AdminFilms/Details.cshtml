@@ -1,4 +1,4 @@
-@model CinemaDomain.Model.Film
+@model CinemaWeb.ViewModels.AdminFilmDetailsViewModel
 
 @{
     ViewData["Title"] = "Film Details";
@@ -7,103 +7,122 @@
 <div class="container mt-4">
     <div class="card shadow">
         <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center">
-            <h2 class="mb-0">@Model.Name</h2>
-            <span class="badge bg-warning text-dark">Age: @Model.AllowedMinAge+</span>
+            <h2 class="mb-0">@Model.Title</h2>
+            <span class="badge bg-warning text-dark">@(Model.AllowedMinAge ?? 0)+</span>
         </div>
         <div class="card-body">
             <div class="row">
                 <div class="col-md-4 text-center">
                     @if (!string.IsNullOrEmpty(Model.PosterUrl))
                     {
-                        <img src="@Model.PosterUrl" alt="@Model.Name" class="img-fluid rounded shadow-sm" style="max-height: 500px; object-fit: cover;" />
+                        <img src="@Model.PosterUrl" alt="@Model.Title" class="img-fluid rounded shadow-sm" style="max-height: 500px; object-fit: cover;" />
                     }
                     else
                     {
-                        <div class="alert alert-secondary py-5">No Poster Available</div>
-                    }
-
-                    @if (!string.IsNullOrEmpty(Model.TrailerUrl))
-                    {
-                        <div class="mt-3">
-                            <a href="@Model.TrailerUrl" target="_blank" class="btn btn-danger w-100">
-                                <i class="bi bi-youtube"></i> Watch Trailer
-                            </a>
-                        </div>
+                        <div class="alert alert-secondary py-5">Постер відсутній</div>
                     }
                 </div>
 
                 <div class="col-md-8">
                     <dl class="row">
-                        <dt class="col-sm-3">Description:</dt>
+                        <dt class="col-sm-3">Опис:</dt>
                         <dd class="col-sm-9">
-                            @(string.IsNullOrEmpty(Model.Description) ? "No description provided." : Model.Description)
+                            @(string.IsNullOrEmpty(Model.Description) ? "Дані відсутні" : Model.Description)
                         </dd>
 
-                        <dt class="col-sm-3">Release Date:</dt>
+                        <dt class="col-sm-3">Дата виходу:</dt>
                         <dd class="col-sm-9">
                             @(Model.ReleaseDate.HasValue
-                                                        ? Model.ReleaseDate.Value.ToString("MMMM d, yyyy")
-                                                        : "Unknown")
+                                                        ? Model.ReleaseDate.Value.ToString("d MMMM, yyyy")
+                                                        : "Дані відсутні")
                         </dd>
 
-                        <dt class="col-sm-3">Duration:</dt>
-                        <dd class="col-sm-9">@Model.DurationMinutes min</dd>
+                        <dt class="col-sm-3">Тривалість:</dt>
+                        <dd class="col-sm-9">@Model.DurationMinutes хв.</dd>
 
-                        <dt class="col-sm-3">Producer:</dt>
-                        <dd class="col-sm-9">@(Model.Producer?.Name ?? "Not specified")</dd>
+                        <dt class="col-sm-3">Продюсер:</dt>
+                        <dd class="col-sm-9">@(Model.ProducerName ?? "Дані відсутні")</dd>
 
                         <hr class="my-3" />
 
-                        <dt class="col-sm-3">Genres:</dt>
+                        <dt class="col-sm-3">Жанри:</dt>
                         <dd class="col-sm-9">
-                            @if (Model.FilmGenres.Any())
+                            @if (Model.Genres.Any())
                             {
-                                @foreach (var fg in Model.FilmGenres)
+                                @foreach (var genre in Model.Genres)
                                 {
-                                    <span class="badge bg-secondary me-1">@fg.Genre?.Name</span>
+                                    <span class="badge bg-secondary me-1">@genre</span>
                                 }
                             }
                             else
                             {
-                                <span class="text-muted">None</span>
+                                <span class="text-muted">Дані відсутні</span>
                             }
                         </dd>
 
-                        <dt class="col-sm-3">Actors:</dt>
+                        <dt class="col-sm-3">Актори:</dt>
                         <dd class="col-sm-9">
-                            @if (Model.FilmActors.Any())
+                            @if (Model.Actors.Any())
                             {
                                 <ul class="list-unstyled mb-0">
-                                    @foreach (var fa in Model.FilmActors)
+                                    @foreach (var actor in Model.Actors)
                                     {
                                         <li>
-                                            <i class="bi bi-person-fill text-muted"></i> @fa.Actor?.Name
+                                            <i class="bi bi-person-fill text-muted"></i> @actor
                                         </li>
                                     }
                                 </ul>
                             }
                             else
                             {
-
-                                <span class="text-muted">None</span>
+                                <span class="text-muted">Дані відсутні</span>
                             }
                         </dd>
 
-                        <dt class="col-sm-3">Companies:</dt>
+                        <dt class="col-sm-3">Виробники:</dt>
                         <dd class="col-sm-9">
-                            @if (Model.FilmCompanies.Any())
+                            @if (Model.Companies.Any())
                             {
                                 <ul class="list-unstyled mb-0">
-                                    @foreach (var fc in Model.FilmCompanies)
+                                    @foreach (var company in Model.Companies)
                                     {
-                                        <li>@fc.Company?.Name</li>
+                                        <li>@company</li>
                                     }
                                 </ul>
                             }
                             else
                             {
 
-                                <span class="text-muted">None</span>
+                                <span class="text-muted">Дані відсутні</span>
+                            }
+                        </dd>
+
+                        <dt class="col-sm-3">Трейлер:</dt>
+                        <dd class="col-sm-9">
+                            @if (!string.IsNullOrEmpty(Model.TrailerEmbedUrl))
+                            {
+                                <div class="mt-3">
+                                    <div class="ratio ratio-16x9 shadow-sm rounded overflow-hidden">
+                                        <iframe src="@Model.TrailerEmbedUrl"
+                                                title="YouTube video player"
+                                                frameborder="0"
+                                                allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+                                                allowfullscreen>
+                                        </iframe>
+                                    </div>
+                                </div>
+                            }
+                            else if (!string.IsNullOrEmpty(Model.TrailerUrl))
+                            {
+                                <div class="mt-3">
+                                    <a href="@Model.TrailerUrl" target="_blank" class="btn btn-danger w-100">
+                                        <i class="bi bi-youtube"></i> Дивитися трейлер
+                                    </a>
+                                </div>
+                            }
+                            else
+                            {
+                                <span class="text-muted">Дані відсутні</span>
                             }
                         </dd>
                     </dl>
@@ -111,8 +130,8 @@
             </div>
         </div>
         <div class="card-footer text-end">
-            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Edit Film</a>
-            <a asp-action="Index" class="btn btn-outline-secondary">Back to List</a>
+            <a asp-action="Edit" asp-route-id="@Model.Id" class="btn btn-warning">Редагувати фільм</a>
+            <a asp-action="Index" class="btn btn-outline-secondary">Назад до списку</a>
         </div>
     </div>
 </div>
