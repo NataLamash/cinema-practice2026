@@ -4,7 +4,7 @@ using System.ComponentModel.DataAnnotations;
 
 namespace CinemaWeb.ViewModels
 {
-    public class AdminFilmFormViewModel
+    public class FilmFormViewModel
     {
         public int Id { get; set; }
 
