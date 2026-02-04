@@ -1,0 +1,59 @@
+@model CinemaWeb.ViewModels.AdminSessionDetailsViewModel
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h2>Деталі ціноутворення сеансу</h2>
+        <a asp-action="Index" class="btn btn-outline-secondary">Назад до списку</a>
+    </div>
+
+    <div class="card shadow-sm mb-4">
+        <div class="card-header bg-primary text-white">
+            <h5 class="mb-0">Інформація про сеанс</h5>
+        </div>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-4">
+                    <p class="mb-1 text-muted">Фільм</p>
+                    <h5 class="fw-bold">@Model.Session.Film?.Name</h5>
+                </div>
+                <div class="col-md-4">
+                    <p class="mb-1 text-muted">Зал</p>
+                    <h5 class="fw-bold">@Model.Session.Hall?.Name</h5>
+                </div>
+                <div class="col-md-4">
+                    <p class="mb-1 text-muted">Базова ціна</p>
+                    <h5 class="text-success fw-bold">@Model.Session.BasePrice.ToString("F2") грн</h5>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card shadow-sm">
+        <div class="card-header bg-dark text-white">
+            <h5 class="mb-0">Розподіл цін за типами місць</h5>
+        </div>
+        <table class="table table-hover mb-0">
+            <thead class="table-light">
+                <tr>
+                    <th>Тип місця</th>
+                    <th class="text-center">Кількість у залі</th>
+                    <th class="text-center">Націнка (%)</th>
+                    <th class="text-end">Кінцева ціна</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var detail in Model.PricingDetails)
+                {
+                    <tr>
+                        <td><strong>@detail.SeatTypeName</strong></td>
+                        <td class="text-center">@detail.SeatCount</td>
+                        <td class="text-center text-muted">+@detail.MarkUp%</td>
+                        <td class="text-end">
+                            <span class="badge bg-success fs-6">@detail.FinalPrice.ToString("F2") грн</span>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

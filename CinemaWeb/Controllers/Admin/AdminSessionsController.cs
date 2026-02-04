@@ -141,6 +141,41 @@ namespace CinemaWeb.Controllers.Admin
             return RedirectToAction(nameof(Index));
         }
 
+        // GET: AdminSessions/Details/5
+        public async Task<IActionResult> Details(int? id)
+        {
+            if (id == null) return NotFound();
+
+            var session = await _context.Sessions
+                .Include(s => s.Film)
+                .Include(s => s.Hall)
+                .FirstOrDefaultAsync(s => s.Id == id); 
+
+            if (session == null) return NotFound();
+
+            var pricingGroups = await _context.Seats
+                .Where(s => s.HallId == session.HallId)
+                .Include(s => s.SeatType)
+                .GroupBy(s => s.SeatType)
+                .Select(group => new SeatTypePricingGroup
+                {
+                    SeatTypeName = group.Key.Name,
+                    SeatCount = group.Count(),
+                    MarkUp = group.Key.MarkUpInPercentage ?? 0m,
+
+                    FinalPrice = session.BasePrice * (1 + ((group.Key.MarkUpInPercentage ?? 0m) / 100m))
+                })
+                .ToListAsync();
+
+            var viewModel = new AdminSessionDetailsViewModel
+            {
+                Session = session,
+                PricingDetails = pricingGroups
+            };
+
+            return View(viewModel);
+        }
+
         private async Task PopulateListsAsync()
         {
             ViewBag.Films = new SelectList(await _context.Films.OrderBy(f => f.Name).ToListAsync(), "Id", "Name");
