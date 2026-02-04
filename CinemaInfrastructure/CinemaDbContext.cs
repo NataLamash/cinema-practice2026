@@ -83,6 +83,7 @@ namespace CinemaInfrastructure
                     .HasForeignKey(o => o.StatusId);
 
                 entity.Property(o => o.OrderDate).IsRequired();
+                entity.Property(o => o.TotalPrice).HasPrecision(10, 2).IsRequired();
             });
 
             modelBuilder.Entity<HallType>(entity =>
@@ -252,6 +253,8 @@ namespace CinemaInfrastructure
             modelBuilder.Entity<Ticket>(entity =>
             {
                 entity.HasIndex(t => new { t.SessionId, t.SeatId }).IsUnique();
+
+                entity.Property(t => t.PurchasePrice).HasPrecision(10, 2).IsRequired();
 
                 entity.HasOne(t => t.Order)
                     .WithMany(o => o.Tickets)

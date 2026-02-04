@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net.Sockets;
@@ -15,6 +15,7 @@ namespace CinemaDomain.Model
         public int StatusId { get; set; }
 
         public DateTime OrderDate { get; set; }
+        public decimal TotalPrice { get; set; }
 
         // Navigation
         public User? User { get; set; }
