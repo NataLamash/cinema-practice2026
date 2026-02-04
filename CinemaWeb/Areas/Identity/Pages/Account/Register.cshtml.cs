@@ -47,36 +47,36 @@ namespace CinemaWeb.Areas.Identity.Pages.Account
 
         public class InputModel
         {
-            [Required]
+            [Required(ErrorMessage = "Це обов'язкове поле.")]
             [EmailAddress]
             [Display(Name = "Електронна адреса")]
             public string Email { get; set; }
 
-            [Required]
+            [Required(ErrorMessage = "Це обов'язкове поле.")]
             [Display(Name = "Ім'я")]
             [StringLength(50)]
             public string FirstName { get; set; }
 
-            [Required]
+            [Required(ErrorMessage = "Це обов'язкове поле.")]
             [Display(Name = "Прізвище")]
             [StringLength(50)]
             public string LastName { get; set; }
 
-            [Required]
+            [Required(ErrorMessage = "Це обов'язкове поле.")]
             [DataType(DataType.Date)]
             [Display(Name = "Дата народження")]
             [BirthDate]
             public DateTime DateOfBirth { get; set; }
 
-            [Required]
+            [Required(ErrorMessage = "Це обов'язкове поле.")]
             [StringLength(100, ErrorMessage = "{0} має бути від {2} до {1} символів.", MinimumLength = 6)]
             [DataType(DataType.Password)]
             [Display(Name = "Пароль")]
             public string Password { get; set; }
 
             [DataType(DataType.Password)]
-            [Display(Name = "Підтвердження паролю")]
-            [Compare("Password", ErrorMessage = "Пароль та підтвердження паролю не співпадають.")]
+            [Display(Name = "Підтвердження пароля")]
+            [Compare("Password", ErrorMessage = "Пароль та підтвердження паролю не збігаються.")]
             public string ConfirmPassword { get; set; }
         }
 
