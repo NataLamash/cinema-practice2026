@@ -1,0 +1,48 @@
+@model IEnumerable<CinemaDomain.Model.SeatType>
+
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-3">
+        <h2>Типи місць та націнки</h2>
+        <a asp-action="Create" class="btn btn-primary shadow-sm">Створити новий тип</a>
+    </div>
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show" role="alert">
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="table-responsive shadow-sm">
+        <table class="table table-hover border">
+            <thead class="table-dark">
+                <tr>
+                    <th>Назва</th>
+                    <th>Націнка (%)</th>
+                    <th>Опис</th>
+                    <th class="text-center">Дії</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td><strong>@item.Name</strong></td>
+                        <td>@item.MarkUpInPercentage %</td>
+                        <td>@item.Description</td>
+                        <td class="text-center">
+                            <div class="btn-group">
+                                <a asp-action="Edit" asp-route-id="@item.Id" class="btn btn-sm btn-outline-warning">Редагувати</a>
+                                <form asp-action="Delete" asp-route-id="@item.Id" method="post"
+                                      onsubmit="return confirm('Видалити цей тип місця?')">
+                                    <button type="submit" class="btn btn-sm btn-outline-danger ms-1">Видалити</button>
+                                </form>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
