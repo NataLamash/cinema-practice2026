@@ -7,6 +7,7 @@ using Microsoft.AspNetCore.Mvc.Rendering;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Net;
+using System.Text.RegularExpressions;
 
 namespace CinemaWeb.Controllers.Admin
 {
@@ -81,7 +82,7 @@ namespace CinemaWeb.Controllers.Admin
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(FilmFormViewModel model)
         {
-            RunChecks(model);
+            RunChecks(model, null);
 
             if (ModelState.IsValid)
             {
@@ -164,7 +165,7 @@ namespace CinemaWeb.Controllers.Admin
             ModelState.Remove(nameof(model.SelectedCompanyIds));
             ModelState.Remove(nameof(model.PosterUrl));
 
-            RunChecks(model);
+            RunChecks(model, model.Id);
 
             if (ModelState.IsValid)
             {
@@ -244,9 +245,9 @@ namespace CinemaWeb.Controllers.Admin
             model.CompaniesList = new SelectList(await _context.Companies.ToListAsync(), "Id", "Name");
         }
 
-        private void RunChecks(FilmFormViewModel model)
+        private void RunChecks(FilmFormViewModel model, int? editId)
         {
-            if (CheckNameDuplication(model.Name))
+            if ((editId == null && CheckNameDuplication(model.Name)) || CheckEditedNameDuplication(model.Name, editId))
             {
                 ModelState.AddModelError("Name", "Фільм з такою назвою вже існує.");
             }
@@ -256,6 +257,10 @@ namespace CinemaWeb.Controllers.Admin
             }
         }
 
+        private bool CheckEditedNameDuplication(string name, int? id)
+        {
+            return _context.Films.Any(f => f.Name == name && f.Id != id);
+        }
         private bool CheckNameDuplication(string name)
         {
             return _context.Films.Any(f => f.Name == name);
@@ -263,34 +268,11 @@ namespace CinemaWeb.Controllers.Admin
 
         public bool UrlIsYouTubeVideo(string url)
         {
-            try
-            {
-                var request = WebRequest.Create(url);
-                request.Timeout = 5000;
-                request.Method = "HEAD";
+            if (string.IsNullOrEmpty(url)) return false;
 
-                using (var response = (HttpWebResponse)request.GetResponse())
-                {
-                    if (response.StatusCode != HttpStatusCode.OK) return false;
+            string pattern = @"^(https?\:\/\/)?(www\.youtube\.com|youtu\.be)\/.+$";
 
-                    Uri finalUri = response.ResponseUri;
-                    string host = finalUri.Host.ToLower();
-
-                    if (!host.EndsWith("youtube.com") && !host.EndsWith("youtu.be"))
-                        return false;
-
-                    bool isStandardVideo = finalUri.AbsolutePath.Equals("/watch", StringComparison.OrdinalIgnoreCase)
-                                           && finalUri.Query.Contains("v=");
-
-                    bool isShorts = finalUri.AbsolutePath.StartsWith("/shorts/", StringComparison.OrdinalIgnoreCase);
-
-                    return isStandardVideo || isShorts;
-                }
-            }
-            catch
-            {
-                return false;
-            }
+            return Regex.IsMatch(url, pattern);
         }
 
         [HttpPost, ActionName("Delete")]
