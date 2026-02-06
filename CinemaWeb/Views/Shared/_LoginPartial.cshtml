@@ -9,6 +9,9 @@
             <span class="nav-link text-muted">@User.Identity?.Name</span>
         </li>
         <li class="nav-item">
+            <a class="nav-link text-dark" asp-controller="Account" asp-action="Orders">Мої замовлення</a>
+        </li>
+        <li class="nav-item">
             <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="d-inline">
                 <button type="submit" class="nav-link btn btn-link p-0">Logout</button>
             </form>

@@ -1,0 +1,60 @@
+@model CinemaWeb.ViewModels.OrderDetailsViewModel
+
+@{
+    ViewData["Title"] = "Деталі замовлення #" + Model.OrderId;
+}
+
+<div class="container mt-4">
+    <div class="card">
+        <div class="card-header bg-primary text-white d-flex justify-content-between align-items-center">
+            <h3 class="mb-0">Замовлення #@Model.OrderId</h3>
+            <span class="badge bg-light text-dark">@Model.Status</span>
+        </div>
+        <div class="card-body">
+            <div class="row mb-3">
+                <div class="col-md-6">
+                    <p><strong>Дата замовлення:</strong> @Model.OrderDate.ToString("F")</p>
+                </div>
+            </div>
+
+            <h4>Квитки</h4>
+            <div class="table-responsive">
+                <table class="table table-striped">
+                    <thead>
+                        <tr>
+                            <th>Фільм</th>
+                            <th>Час сеансу</th>
+                            <th>Зал</th>
+                            <th>Місце</th>
+                            <th>Ціна</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var ticket in Model.Tickets)
+                        {
+                            <tr>
+                                <td><strong>@ticket.FilmTitle</strong></td>
+                                <td>@ticket.SessionStart.ToString("g")</td>
+                                <td>@ticket.HallName</td>
+                                <td>
+                                    Ряд: <strong>@ticket.Row</strong>,
+                                    Місце: <strong>@ticket.SeatNumber</strong>
+                                </td>
+                                <td>@ticket.Price.ToString("C")</td>
+                            </tr>
+                        }
+                    </tbody>
+                    <tfoot>
+                        <tr>
+                            <td colspan="4" class="text-end"><strong>Загальна сума:</strong></td>
+                            <td><strong>@Model.Tickets.Sum(t => t.Price).ToString("C")</strong></td>
+                        </tr>
+                    </tfoot>
+                </table>
+            </div>
+        </div>
+        <div class="card-footer">
+            <a asp-action="Orders" class="btn btn-secondary"> Назад до списку</a>
+        </div>
+    </div>
+</div>

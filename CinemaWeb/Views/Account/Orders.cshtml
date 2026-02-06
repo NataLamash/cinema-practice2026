@@ -1,0 +1,53 @@
+@model IEnumerable<CinemaWeb.ViewModels.OrderListViewModel>
+
+@{
+    ViewData["Title"] = "Мої замовлення";
+}
+
+<div class="container mt-4">
+    <h2>Історія замовлень</h2>
+    <hr />
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-info">
+            У вас поки немає замовлень. <a asp-controller="Home" asp-action="Index">Купити квитки</a>
+        </div>
+    }
+    else
+    {
+        <table class="table table-hover table-bordered">
+            <thead class="table-light">
+                <tr>
+                    <th>#</th>
+                    <th>Дата створення</th>
+                    <th>Статус</th>
+                    <th>Квитків</th>
+                    <th>Сума</th>
+                    <th>Дії</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var order in Model)
+                {
+                    <tr>
+                        <td>@order.Id</td>
+                        <td>@order.OrderDate.ToString("g")</td>
+                        <td>
+                            <span class="badge @(order.Status == "Paid" ? "bg-success" : "bg-secondary")">
+                                @order.Status
+                            </span>
+                        </td>
+                        <td>@order.TicketsCount</td>
+                        <td>@order.TotalPrice.ToString("C")</td>
+                        <td>
+                            <a asp-action="OrderDetails" asp-route-id="@order.Id" class="btn btn-primary btn-sm">
+                                Деталі
+                            </a>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    }
+</div>
