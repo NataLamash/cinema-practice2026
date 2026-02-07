@@ -1,0 +1,38 @@
+@model CinemaWeb.ViewModels.AdminOrderEditViewModel
+
+<div class="container mt-4">
+    <h2>Правити статус замовлення</h2>
+    <hr />
+    
+    <div class="row">
+        <div class="col-md-6">
+            <form asp-action="Edit">
+                <input type="hidden" asp-for="Id" />
+
+                <div class="mb-3">
+                    <label asp-for="UserEmail" class="form-label fw-bold"></label>
+                    <p class="form-control-plaintext">@Model.UserEmail</p>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="OrderDate" class="form-label fw-bold"></label>
+                    <p class="form-control-plaintext">@Model.OrderDate.ToString("g")</p>
+                </div>
+
+                <div class="mb-3">
+                    <label asp-for="TotalPrice" class="form-label fw-bold"></label>
+                    <p class="form-control-plaintext">@Model.TotalPrice.ToString("C")</p>
+                </div>
+
+                <div class="mb-4">
+                    <label asp-for="StatusId" class="form-label fw-bold text-primary"></label>
+                    <select asp-for="StatusId" class="form-select" asp-items="ViewBag.StatusList"></select>
+                    <span asp-validation-for="StatusId" class="text-danger"></span>
+                </div>
+
+                <button type="submit" class="btn btn-primary">Зберегти зміни</button>
+                <a asp-action="Index" class="btn btn-secondary">Скасувати</a>
+            </form>
+        </div>
+    </div>
+</div>

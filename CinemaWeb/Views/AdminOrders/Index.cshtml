@@ -1,0 +1,71 @@
+@model IEnumerable<CinemaWeb.ViewModels.AdminOrderIndexViewModel>
+
+<div class="container mt-4">
+
+    @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="table-responsive shadow-sm">
+        <table class="table table-hover border align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>OrderId</th>
+                    <th>User</th>
+                    <th>Дата</th>
+                    <th>TotalPrice</th>
+                    <th>Status</th>
+                    <th>Кількість квитків</th>
+                    <th class="text-center">Дії</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            <strong>@(item.Id)</strong>
+                        </td>
+                        <td>@(item.UserEmail)</td>
+                        <td>@item.OrderDate.ToString("dd.MM.yyyy HH:mm")</td>
+                        <td>
+                            <span class="badge bg-light text-dark border">
+                                @item.TotalPrice.ToString("F2") грн
+                            </span>
+                        </td>
+                        <td>@(item.StatusName)</td>
+                        <td>@(item.TicketCount)</td>
+                        <td class="text-center">
+                            <div class="d-flex justify-content-center gap-2">
+
+                                <a asp-action="Edit" asp-route-id="@item.Id"
+                                   class="btn btn-sm btn-warning">
+                                    <i class="bi bi-pencil-square"></i> Редагувати
+                                </a>
+
+                                <a asp-action="Details" asp-route-id="@item.Id"
+                                   class="btn btn-sm btn-info text-white">
+                                    <i class="bi bi-info-circle"></i> Деталі
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="6" class="text-center py-4 text-muted">
+                            Замовлення відсутні. 
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
