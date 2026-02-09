@@ -3,6 +3,7 @@ using CinemaInfrastructure;
 using CinemaWeb.ViewModels;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using System.Linq;
 
 namespace CinemaWeb.Controllers.Client
 {
@@ -18,7 +19,7 @@ namespace CinemaWeb.Controllers.Client
         // GET: Movies
         public async Task<IActionResult> Index(string searchTerm, string sortOrder)
         {
-            var today = DateTime.Now;
+            var today = DateTime.Now.Date;
             var nextWeek = today.AddDays(7);
 
             var filmsQuery = _context.Films
@@ -32,29 +33,33 @@ namespace CinemaWeb.Controllers.Client
 
             var allFilms = await filmsQuery.ToListAsync();
 
-            var actualFilmsQuery = allFilms
+            var actualFilms = allFilms
                 .Where(f => f.Sessions != null &&
-                            f.Sessions.Any(s => s.StartTime >= today && s.StartTime <= nextWeek));
+                            f.Sessions.Any(s => s.StartTime.Date >= today && s.StartTime.Date <= nextWeek))
+                .ToList();
 
-            var expectedFilmsQuery = allFilms
-                .Where(f => f.ReleaseDate > today || f.Sessions == null || !f.Sessions.Any())
-                .Except(actualFilmsQuery);
+            var actualIds = actualFilms.Select(a => a.Id).ToHashSet();
+
+
+            var expectedFilms = allFilms
+                .Where(f => !actualIds.Contains(f.Id))
+                .ToList();
 
             switch (sortOrder)
             {
                 case "name":
-                    actualFilmsQuery = actualFilmsQuery.OrderBy(f => f.Name);
-                    expectedFilmsQuery = expectedFilmsQuery.OrderBy(f => f.Name);
+                    actualFilms = actualFilms.OrderBy(f => f.Name).ToList();
+                    expectedFilms = expectedFilms.OrderBy(f => f.Name).ToList();
                     break;
 
                 case "date_desc":
-                    actualFilmsQuery = actualFilmsQuery.OrderByDescending(f => f.ReleaseDate);
-                    expectedFilmsQuery = expectedFilmsQuery.OrderByDescending(f => f.ReleaseDate);
+                    actualFilms = actualFilms.OrderByDescending(f => f.ReleaseDate).ToList();
+                    expectedFilms = expectedFilms.OrderByDescending(f => f.ReleaseDate).ToList();
                     break;
 
                 default:
-                    actualFilmsQuery = actualFilmsQuery.OrderByDescending(f => f.ReleaseDate);
-                    expectedFilmsQuery = expectedFilmsQuery.OrderByDescending(f => f.ReleaseDate);
+                    actualFilms = actualFilms.OrderByDescending(f => f.ReleaseDate).ToList();
+                    expectedFilms = expectedFilms.OrderByDescending(f => f.ReleaseDate).ToList();
                     break;
             }
 
@@ -64,8 +69,8 @@ namespace CinemaWeb.Controllers.Client
             var viewModel = new ClientFilmViewModel
             {
                 SearchTerm = searchTerm,
-                ActualFilms = actualFilmsQuery.ToList(),
-                ExpectedFilms = expectedFilmsQuery.ToList()
+                ActualFilms = actualFilms,
+                ExpectedFilms = expectedFilms
             };
 
             return View(viewModel);
@@ -103,6 +108,7 @@ namespace CinemaWeb.Controllers.Client
                 return NotFound();
             }
 
+
             var viewModel = new ClientFilmDetailsViewModel
             {
                 Id = film.Id,
@@ -125,4 +131,3 @@ namespace CinemaWeb.Controllers.Client
     }
 
 }
-
