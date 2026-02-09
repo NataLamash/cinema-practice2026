@@ -64,11 +64,6 @@ namespace CinemaInfrastructure
 
                 entity.Property(os => os.Name).HasMaxLength(50).IsRequired();
 
-                entity.HasData(
-                    new OrderStatus { Id = 1, Name = "Reserved" },
-                    new OrderStatus { Id = 2, Name = "Paid" },
-                    new OrderStatus { Id = 3, Name = "Cancelled" }
-                );
             });
 
             modelBuilder.Entity<Order>(entity =>
@@ -90,11 +85,6 @@ namespace CinemaInfrastructure
             {
                 entity.Property(h => h.Name).HasMaxLength(50).IsRequired();
 
-                entity.HasData(
-                    new HallType { Id = 1, Name = "Standard", Description = "Regular cinema hall" },
-                    new HallType { Id = 2, Name = "IMAX", Description = "IMAX large format hall" },
-                    new HallType { Id = 3, Name = "VIP", Description = "VIP hall with premium seats" }
-                );
             });
 
             modelBuilder.Entity<Hall>(entity =>
@@ -112,12 +102,6 @@ namespace CinemaInfrastructure
             {
                 entity.Property(st => st.Name).HasMaxLength(50).IsRequired();
                 entity.Property(st => st.MarkUpInPercentage).HasPrecision(10, 2);
-
-                entity.HasData(
-                    new SeatType { Id = 1, Name = "Standard", MarkUpInPercentage = 0, Description = "Regular seat" },
-                    new SeatType { Id = 2, Name = "Comfort", MarkUpInPercentage = 15, Description = "More comfortable seat" },
-                    new SeatType { Id = 3, Name = "VIP", MarkUpInPercentage = 30, Description = "Premium seat" }
-                );
             });
 
             modelBuilder.Entity<Seat>(entity =>
