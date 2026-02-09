@@ -1,0 +1,56 @@
+@model IEnumerable<CinemaWeb.ViewModels.AdminOrderDetailsViewModel>
+
+<div class="container mt-4"> @if (TempData["Error"] != null)
+    {
+        <div class="alert alert-danger alert-dismissible fade show shadow-sm" role="alert">
+            <i class="bi bi-exclamation-triangle-fill me-2"></i>
+            @TempData["Error"]
+            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+        </div>
+    }
+
+    <div class="table-responsive shadow-sm">
+        <table class="table table-hover border align-middle">
+            <thead class="table-dark">
+                <tr>
+                    <th>TicketId</th>
+                    <th>Сеанс</th>
+                    <th>Ряд | Місце</th>
+                    <th>Ціна</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var item in Model)
+                {
+                    <tr>
+                        <td>
+                            <strong>@(item.TicketId)</strong>
+                        </td>
+                        <td>  
+                            <a asp-action="Details" 
+                                asp-controller="AdminSessions" 
+                                asp-route-id="@item.SessionId"
+                                class="btn btn-sm btn-info text-white">
+                                @item.SessionId 
+                            </a>
+                        </td>
+                        <td>@item.Row | @item.SeatNumber</td>
+                        <td>
+                            <span class="badge bg-light text-dark border">
+                                @item.Price.ToString("F2") грн
+                            </span>
+                        </td>
+                    </tr> }
+
+                @if (!Model.Any())
+                {
+                    <tr>
+                        <td colspan="4" class="text-center py-4 text-muted">
+                            Квитки відсутні. 
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
