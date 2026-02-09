@@ -1,0 +1,226 @@
+@model CinemaWeb.ViewModels.Booking.SelectSeatsViewModel
+
+@{
+    ViewData["Title"] = "Select seats";
+}
+
+<h2 class="mb-2">Вибір місць</h2>
+
+<div class="text-muted mb-3">
+    <div><strong>Сеанс:</strong> @Model.SessionId</div>
+    <div><strong>Фільм:</strong> @Model.FilmTitle</div>
+    <div><strong>Час:</strong> @Model.StartTime</div>
+    <div><strong>Зал:</strong> @Model.HallName</div>
+    <div><strong>Базова ціна:</strong> @Model.BasePrice</div>
+</div>
+
+@if (!string.IsNullOrWhiteSpace(Model.ErrorMessage))
+{
+    <div class="alert alert-warning">@Model.ErrorMessage</div>
+}
+
+<form id="confirmForm" method="post">
+    @Html.AntiForgeryToken()
+    <input type="hidden" name="sessionId" value="@Model.SessionId" />
+
+    <div class="row">
+        <div class="col-lg-8">
+            <div class="mb-2"><strong>Екран</strong></div>
+            <div class="border rounded p-2 mb-3 text-center bg-light">SCREEN</div>
+
+            <div class="d-flex flex-column gap-2" id="seatMap">
+                @foreach (var row in Model.Rows)
+                {
+                    <div class="d-flex align-items-center gap-2">
+                        <div class="text-muted" style="width:60px;">
+                            Ряд @row.RowNumber
+                        </div>
+
+                        <div class="d-flex flex-wrap gap-2">
+                            @foreach (var seat in row.Seats)
+                            {
+                                var btnClass = seat.IsTaken ? "btn-secondary" : "btn-outline-primary";
+                                var title = seat.IsTaken
+                                ? $"Зайнято | {seat.SeatTypeName} | {seat.Price}"
+                                : $"Вільно | {seat.SeatTypeName} | {seat.Price}";
+
+                                <button type="button"
+                                        class="btn btn-sm @btnClass seat-btn"
+                                        style="min-width:48px;"
+                                        title="@title"
+                                        data-seat-id="@seat.SeatId"
+                                        data-row="@seat.Row"
+                                        data-number="@seat.Number"
+                                        data-type="@seat.SeatTypeName"
+                                        data-price="@seat.Price"
+                                        @(seat.IsTaken ? "disabled" : "")>
+                                    @seat.Number
+                                </button>
+                            }
+                        </div>
+                    </div>
+                }
+            </div>
+
+            <div class="mt-3">
+                <span class="badge bg-secondary">Зайнято</span>
+                <span class="badge bg-primary">Вільно</span>
+                <span class="badge bg-success">Обрано</span>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="card">
+                <div class="card-body">
+                    <h5 class="card-title">Ваш вибір</h5>
+
+                    <div class="mb-2">
+                        <strong>Кількість:</strong> <span id="selectedCount">0</span>
+                    </div>
+
+                    <div class="mb-2">
+                        <strong>Загальна сума:</strong> <span id="selectedTotal">0</span>
+                    </div>
+
+                    <ul id="selectedList" class="small mb-3"></ul>
+
+                    <div id="hiddenInputs"></div>
+
+                    <button type="button" id="confirmBtn" class="btn btn-success w-100">
+                        Перейти до підтвердження
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+</form>
+
+@section Scripts {
+    <script>
+        (function () {
+            const selected = new Map();
+            const seatButtons = document.querySelectorAll(".seat-btn");
+
+            const selectedCountEl = document.getElementById("selectedCount");
+            const selectedTotalEl = document.getElementById("selectedTotal");
+            const selectedListEl = document.getElementById("selectedList");
+            const hiddenInputsEl = document.getElementById("hiddenInputs");
+
+            const form = document.getElementById("confirmForm");
+            const confirmBtn = document.getElementById("confirmBtn");
+            const sessionId = parseInt(document.querySelector('input[name="sessionId"]').value, 10);
+
+            function render() {
+                let total = 0;
+                selected.forEach(v => total += v.price);
+
+                selectedCountEl.textContent = selected.size.toString();
+                selectedTotalEl.textContent = total.toFixed(2);
+
+                selectedListEl.innerHTML = "";
+                [...selected.values()]
+                    .sort((a, b) => a.row === b.row ? a.number - b.number : a.row - b.row)
+                    .forEach(v => {
+                        const li = document.createElement("li");
+                        li.textContent = `Ряд ${v.row}, місце ${v.number} — ${v.type} — ${v.price.toFixed(2)}`;
+                        selectedListEl.appendChild(li);
+                    });
+
+                hiddenInputsEl.innerHTML = "";
+                selected.forEach((v, seatId) => {
+                    const input = document.createElement("input");
+                    input.type = "hidden";
+                    input.name = "selectedSeatIds";
+                    input.value = seatId;
+                    hiddenInputsEl.appendChild(input);
+                });
+            }
+
+            seatButtons.forEach(btn => {
+                if (btn.disabled) return;
+
+                btn.addEventListener("click", () => {
+                    const seatId = btn.getAttribute("data-seat-id");
+                    const row = parseInt(btn.getAttribute("data-row"), 10);
+                    const number = parseInt(btn.getAttribute("data-number"), 10);
+                    const type = btn.getAttribute("data-type");
+                    const price = parseFloat(btn.getAttribute("data-price"));
+
+                    if (selected.has(seatId)) {
+                        selected.delete(seatId);
+                        btn.classList.remove("btn-success");
+                        btn.classList.add("btn-outline-primary");
+                    } else {
+                        selected.set(seatId, { row, number, type, price });
+                        btn.classList.remove("btn-outline-primary");
+                        btn.classList.add("btn-success");
+                    }
+
+                    render();
+                });
+            });
+
+                    const isAuthenticated = @User.Identity.IsAuthenticated.ToString().ToLower();
+
+        confirmBtn.addEventListener("click", async () => {
+            if (selected.size === 0) {
+                alert("Оберіть хоча б одне місце.");
+                return;
+            }
+
+            const returnUrl = encodeURIComponent(window.location.pathname + window.location.search);
+
+            if (!isAuthenticated) {
+                window.location.href = `/Identity/Account/Login?returnUrl=${returnUrl}`;
+                return;
+            }
+
+            const payload = {
+                sessionId: sessionId,
+                seatIds: Array.from(selected.keys()).map(x => parseInt(x, 10))
+            };
+
+            const tokenInput = form.querySelector('input[name="__RequestVerificationToken"]');
+            const antiForgeryToken = tokenInput ? tokenInput.value : null;
+
+            const res = await fetch("/api/Booking/Confirm", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json",
+                    ...(antiForgeryToken ? { "RequestVerificationToken": antiForgeryToken } : {})
+                },
+                credentials: "same-origin",
+                body: JSON.stringify(payload)
+            });
+
+            if (res.redirected) {
+                window.location.href = res.url;
+                return;
+            }
+
+            const ct = (res.headers.get("content-type") || "").toLowerCase();
+            if (!ct.includes("application/json")) {
+                window.location.href = `/Identity/Account/Login?returnUrl=${returnUrl}`;
+                return;
+            }
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                alert((data && (data.message || data.Message)) || "Помилка підтвердження.");
+                return;
+            }
+
+            const orderId = data?.orderId ?? data?.OrderId;
+            if (orderId) {
+                window.location.href = `/Booking/Confirm?orderId=${orderId}`;
+                return;
+            }
+
+            alert("Підтверджено, але не отримали OrderId у відповіді.");
+        });
+
+            render();
+        })();
+    </script>
+}

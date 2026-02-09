@@ -1,0 +1,51 @@
+@model CinemaDomain.Model.Order
+
+@{
+    ViewData["Title"] = "Підтвердження";
+    var firstTicket = Model.Tickets.FirstOrDefault();
+    var session = firstTicket?.Session;
+    var filmTitle = session?.Film?.Name ?? "";
+    var hallName = session?.Hall?.Name ?? "";
+}
+
+<div class="container mt-4">
+    <h2 class="mb-3">Підтвердження бронювання</h2>
+
+    <div class="card mb-3">
+        <div class="card-body">
+            <div><strong>Замовлення #:</strong> @Model.Id</div>
+            <div><strong>Статус:</strong> @Model.Status?.Name</div>
+            <div><strong>Дата:</strong> @Model.OrderDate</div>
+            <div><strong>Фільм:</strong> @filmTitle</div>
+            <div><strong>Зал:</strong> @hallName</div>
+            <div><strong>Сума:</strong> @Model.TotalPrice</div>
+        </div>
+    </div>
+
+    <h5>Квитки</h5>
+    <table class="table table-bordered">
+        <thead>
+            <tr>
+                <th>Ряд</th>
+                <th>Місце</th>
+                <th>Тип</th>
+                <th>Ціна</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var t in Model.Tickets.OrderBy(x => x.Seat.Row).ThenBy(x => x.Seat.NumberInRow))
+            {
+                <tr>
+                    <td>@t.Seat.Row</td>
+                    <td>@t.Seat.NumberInRow</td>
+                    <td>@t.Seat.SeatType?.Name</td>
+                    <td>@t.PurchasePrice</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+
+    <a class="btn btn-primary" asp-controller="Account" asp-action="Orders">
+        Перейти до моїх замовлень
+    </a>
+</div>

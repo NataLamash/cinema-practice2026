@@ -97,7 +97,7 @@
                                 <td>@item.HallName</td>
                                 <td>від @item.BasePrice UAH</td>
                                 <td>
-                                    <a asp-action="Details" asp-route-id="@item.Id" class="btn btn-sm btn-primary">
+                                    <a asp-controller="Booking" asp-action="SelectSeats" asp-route-sessionId="@item.Id" class="btn btn-primary">
                                         Придбати квиток
                                     </a>
                                 </td>
