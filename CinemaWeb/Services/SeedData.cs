@@ -17,7 +17,7 @@ namespace CinemaWeb.Services
         {
             var context = serviceProvider.GetRequiredService<CinemaDbContext>();
 
-            
+
             //context.Tickets.RemoveRange(context.Tickets);
             //context.Orders.RemoveRange(context.Orders);
             //context.OrderStatuses.RemoveRange(context.OrderStatuses);
@@ -265,7 +265,7 @@ namespace CinemaWeb.Services
                     ReleaseDate = new DateTime(2014, 11, 7),
                     DurationMinutes = 169,
                     AllowedMinAge = 12,
-                    PosterUrl = "https://image.tmdb.org/t/p/original/gEU2QniL6C8z1BHu8sqQjsvl2ym.jpg",
+                    PosterUrl = "https://upload.wikimedia.org/wikipedia/uk/thumb/2/29/Interstellar_film_poster2.jpg/250px-Interstellar_film_poster2.jpg",
                     TrailerUrl = "https://www.youtube.com/watch?v=zSWdZVtXT7E"
                 },
                 new Film {
@@ -274,7 +274,7 @@ namespace CinemaWeb.Services
                     ReleaseDate = new DateTime(2010, 7, 16),
                     DurationMinutes = 148,
                     AllowedMinAge = 12,
-                    PosterUrl = "https://image.tmdb.org/t/p/original/9gk7admal4zl248sKidtwi9x3bH.jpg",
+                    PosterUrl = "https://upload.wikimedia.org/wikipedia/uk/e/e1/%D0%9F%D0%BE%D1%87%D0%B0%D1%82%D0%BE%D0%BA_%D1%84%D1%96%D0%BB%D1%8C%D0%BC%2C_2010.jpg",
                     TrailerUrl = "https://www.youtube.com/watch?v=YoHD9XEInc0"
                 },
                 
@@ -293,7 +293,7 @@ namespace CinemaWeb.Services
                     ReleaseDate = DateTime.Now.AddMonths(5),
                     DurationMinutes = 130,
                     AllowedMinAge = 18,
-                    PosterUrl = "https://image.tmdb.org/t/p/original/aciP8Km0waTLXEYf5ybXB57zbpZ.jpg",
+                    PosterUrl = "https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcSRbt3XFnh20PeBBAYjtPX194Zq9-uqyLnAdQ&s",
                     TrailerUrl = ""
                 },
                  new Film {
@@ -311,7 +311,7 @@ namespace CinemaWeb.Services
                     ReleaseDate = DateTime.Now.AddMonths(8),
                     DurationMinutes = 150,
                     AllowedMinAge = 16,
-                    PosterUrl = "https://image.tmdb.org/t/p/original/2cxhvwyEwRlysAmf4oo67BCZ00.jpg",
+                    PosterUrl = "https://upload.wikimedia.org/wikipedia/uk/a/a8/%D0%93%D0%BB%D0%B0%D0%B4%D1%96%D0%B0%D1%82%D0%BE%D1%80_2_-_%D0%BF%D0%BE%D1%81%D1%82%D0%B5%D1%80.jpg",
                     TrailerUrl = ""
                 },
                  new Film {
@@ -320,7 +320,7 @@ namespace CinemaWeb.Services
                     ReleaseDate = DateTime.Now.AddMonths(2),
                     DurationMinutes = 139,
                     AllowedMinAge = 16,
-                    PosterUrl = "https://image.tmdb.org/t/p/original/55sKjM6G2Fq1x2z1X3lFz1x2z1X.jpg",
+                    PosterUrl = "https://upload.wikimedia.org/wikipedia/uk/c/c4/%D0%9C%D1%96%D0%BA%D1%96_17%2C_2025%2C_%D0%BF%D0%BE%D1%81%D1%82%D0%B5%D1%80.jpg",
                     TrailerUrl = ""
                 }
             };
@@ -340,7 +340,7 @@ namespace CinemaWeb.Services
 
                 if (i < 5)
                 {
-                    for (int day = 0; day < 3; day++)
+                    for (int day = 4; day < 7; day++)
                     {
                         var randomHall = allHalls[random.Next(allHalls.Count)];
 
