@@ -17,14 +17,28 @@ namespace CinemaWeb.Services
         {
             var context = serviceProvider.GetRequiredService<CinemaDbContext>();
 
-            // 1. СТВОРЕННЯ АДМІНА (Залишаємо як було)
+            
+            //context.Tickets.RemoveRange(context.Tickets);
+            //context.Orders.RemoveRange(context.Orders);
+            //context.OrderStatuses.RemoveRange(context.OrderStatuses);
+            //context.Sessions.RemoveRange(context.Sessions);
+            //context.Seats.RemoveRange(context.Seats);
+            //context.SeatTypes.RemoveRange(context.SeatTypes);
+            //context.Halls.RemoveRange(context.Halls);
+            //context.HallTypes.RemoveRange(context.HallTypes);
+            //context.FilmGenres.RemoveRange(context.FilmGenres);
+            //context.Genres.RemoveRange(context.Genres);
+            //context.FilmRatings.RemoveRange(context.FilmRatings);
+            //context.FilmActors.RemoveRange(context.FilmActors);
+            //context.FilmCompanies.RemoveRange(context.FilmCompanies);
+            //context.Films.RemoveRange(context.Films);
+            //await context.SaveChangesAsync();
+
             await EnsureAdminCreated(serviceProvider, configuration, context);
 
-            // 2. СТВОРЕННЯ ДОВІДНИКІВ (Тільки якщо база порожня)
             await EnsureReferenceData(context);
 
-            // 3. СТВОРЕННЯ ФІЛЬМІВ (Українською)
-            //await EnsureFilmsAndSessions(context);
+            await EnsureFilmsAndSessions(context);
         }
 
         private static async Task EnsureAdminCreated(IServiceProvider serviceProvider, IConfiguration configuration, CinemaDbContext context)
@@ -198,6 +212,158 @@ namespace CinemaWeb.Services
                 }
             }
 
+            await context.SaveChangesAsync();
+        }
+
+        private static async Task EnsureFilmsAndSessions(CinemaDbContext context)
+        {
+            if (context.Films.Any())
+            {
+                return;
+            }
+
+            var allGenres = await context.Genres.ToListAsync();
+            var allHalls = await context.Halls.ToListAsync();
+
+            if (!allGenres.Any() || !allHalls.Any())
+            {
+                return;
+            }
+
+            var films = new List<Film>
+            {
+                new Film {
+                    Name = "Дюна: Частина друга",
+                    Description = "Пол Атрід об'єднується з Чані та Фріменами, щоб помститися змовникам, які знищили його родину.",
+                    ReleaseDate = DateTime.Now.AddDays(-10),
+                    DurationMinutes = 166,
+                    AllowedMinAge = 12,
+                    PosterUrl = "https://image.tmdb.org/t/p/original/1pdfLvkbY9ohJlCjQH2CZjjYVvJ.jpg",
+                    TrailerUrl = "https://www.youtube.com/watch?v=Way9Dexny3w"
+                },
+                new Film {
+                    Name = "Оппенгеймер",
+                    Description = "Історія життя американського фізика Роберта Оппенгеймера, який очолював перші розробки ядерної зброї.",
+                    ReleaseDate = DateTime.Now.AddDays(-20),
+                    DurationMinutes = 180,
+                    AllowedMinAge = 16,
+                    PosterUrl = "https://image.tmdb.org/t/p/original/8Gxv8gSFCU0XGDykEGv7zR1n2ua.jpg",
+                    TrailerUrl = "https://www.youtube.com/watch?v=uYPbbksJxIg"
+                },
+                new Film {
+                    Name = "Матриця",
+                    Description = "Хакер Нео дізнається від таємничих повстанців правду про реальність: світ є імітацією, створеною машинами.",
+                    ReleaseDate = new DateTime(1999, 3, 31),
+                    DurationMinutes = 136,
+                    AllowedMinAge = 16,
+                    PosterUrl = "https://image.tmdb.org/t/p/original/f89U3ADr1oiB1s9GkdPOEpXUk5H.jpg",
+                    TrailerUrl = "https://www.youtube.com/watch?v=m8e-FF8MsqU"
+                },
+                new Film {
+                    Name = "Інтерстеллар",
+                    Description = "Команда дослідників вирушає крізь червоточину у просторі, намагаючись знайти нову домівку для людства.",
+                    ReleaseDate = new DateTime(2014, 11, 7),
+                    DurationMinutes = 169,
+                    AllowedMinAge = 12,
+                    PosterUrl = "https://image.tmdb.org/t/p/original/gEU2QniL6C8z1BHu8sqQjsvl2ym.jpg",
+                    TrailerUrl = "https://www.youtube.com/watch?v=zSWdZVtXT7E"
+                },
+                new Film {
+                    Name = "Початок",
+                    Description = "Кобб — талановитий злодій, найкращий у небезпечному мистецтві вилучення: він краде цінні секрети з глибин підсвідомості.",
+                    ReleaseDate = new DateTime(2010, 7, 16),
+                    DurationMinutes = 148,
+                    AllowedMinAge = 12,
+                    PosterUrl = "https://image.tmdb.org/t/p/original/9gk7admal4zl248sKidtwi9x3bH.jpg",
+                    TrailerUrl = "https://www.youtube.com/watch?v=YoHD9XEInc0"
+                },
+                
+                new Film {
+                    Name = "Аватар 3",
+                    Description = "Продовження епічної саги про народ На'ві та їх боротьбу за виживання на Пандорі.",
+                    ReleaseDate = DateTime.Now.AddYears(1),
+                    DurationMinutes = 190,
+                    AllowedMinAge = 12,
+                    PosterUrl = "https://image.tmdb.org/t/p/original/t6HIqrRAclMCA60NsSmeqe9RmNV.jpg",
+                    TrailerUrl = "https://www.youtube.com/watch?v=d9MyqW1pTOc"
+                },
+                 new Film {
+                    Name = "Джокер: Божевілля на двох",
+                    Description = "Артур Флек знаходить кохання та спільницю в стінах лікарі Аркхем.",
+                    ReleaseDate = DateTime.Now.AddMonths(5),
+                    DurationMinutes = 130,
+                    AllowedMinAge = 18,
+                    PosterUrl = "https://image.tmdb.org/t/p/original/aciP8Km0waTLXEYf5ybXB57zbpZ.jpg",
+                    TrailerUrl = ""
+                },
+                 new Film {
+                    Name = "Дедпул 3",
+                    Description = "Дедпул об'єднується з Росомахою, щоб змінити історію кіновсесвіту.",
+                    ReleaseDate = DateTime.Now.AddMonths(3),
+                    DurationMinutes = 120,
+                    AllowedMinAge = 18,
+                    PosterUrl = "https://image.tmdb.org/t/p/original/yF1eOkaYvwiORauRCPWznV9xVvi.jpg",
+                    TrailerUrl = ""
+                },
+                 new Film {
+                    Name = "Гладіатор 2",
+                    Description = "Історія Луція, племінника Коммода, через роки після смерті Максимуса.",
+                    ReleaseDate = DateTime.Now.AddMonths(8),
+                    DurationMinutes = 150,
+                    AllowedMinAge = 16,
+                    PosterUrl = "https://image.tmdb.org/t/p/original/2cxhvwyEwRlysAmf4oo67BCZ00.jpg",
+                    TrailerUrl = ""
+                },
+                 new Film {
+                    Name = "Міккі 17",
+                    Description = "Міккі — «відновлюваний» співробітник, якого відправляють на смертельно небезпечні місії з колонізації крижаного світу.",
+                    ReleaseDate = DateTime.Now.AddMonths(2),
+                    DurationMinutes = 139,
+                    AllowedMinAge = 16,
+                    PosterUrl = "https://image.tmdb.org/t/p/original/55sKjM6G2Fq1x2z1X3lFz1x2z1X.jpg",
+                    TrailerUrl = ""
+                }
+            };
+
+            context.Films.AddRange(films);
+            await context.SaveChangesAsync();
+
+            var sessions = new List<Session>();
+            var random = new Random();
+
+            for (int i = 0; i < films.Count; i++)
+            {
+                var film = films[i];
+
+                var randomGenre = allGenres[random.Next(allGenres.Count)];
+                context.FilmGenres.Add(new FilmGenre { FilmId = film.Id, GenreId = randomGenre.Id });
+
+                if (i < 5)
+                {
+                    for (int day = 0; day < 3; day++)
+                    {
+                        var randomHall = allHalls[random.Next(allHalls.Count)];
+
+                        sessions.Add(new Session
+                        {
+                            FilmId = film.Id,
+                            HallId = randomHall.Id,
+                            StartTime = DateTime.Today.AddDays(day).AddHours(10 + random.Next(0, 8)),
+                            BasePrice = 150 + random.Next(0, 50)
+                        });
+
+                        sessions.Add(new Session
+                        {
+                            FilmId = film.Id,
+                            HallId = randomHall.Id,
+                            StartTime = DateTime.Today.AddDays(day).AddHours(19 + random.Next(0, 2)),
+                            BasePrice = 250
+                        });
+                    }
+                }
+            }
+
+            context.Sessions.AddRange(sessions);
             await context.SaveChangesAsync();
         }
     }
