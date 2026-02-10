@@ -31,22 +31,28 @@
 
                         @if (Model.UpcomingSessions.Any())
                         {
-                            <div class="list-group list-group-flush">
-                                @foreach (var session in Model.UpcomingSessions)
-                                {
-                                    <div class="list-group-item d-flex justify-content-between align-items-center">
-                                        <div>
-                                            <div class="fw-bold text-primary">
-                                                @session.StartTime.ToString("d MMM") о @session.StartTime.ToString("HH:mm")
-                                            </div>
-                                            <small class="text-muted">@session.HallName</small>
+                          <div class="list-group list-group-flush">
+                            @foreach (var session in Model.UpcomingSessions)
+                            {
+                                <a asp-controller="Booking" 
+                                   asp-action="SelectSeats" 
+                                   asp-route-sessionId="@session.SessionId" 
+                                   class="list-group-item list-group-item-action d-flex justify-content-between align-items-center">
+            
+                                    <div>
+                                        <div class="fw-bold text-primary">
+                                            @session.StartTime.ToString("d MMM") о @session.StartTime.ToString("HH:mm")
                                         </div>
-                                        <span class="badge bg-success rounded-pill">
-                                            @session.BasePrice ₴
-                                        </span>
+                                        <small class="text-muted">@session.HallName</small>
                                     </div>
-                                }
-                            </div>
+            
+                                    <span class="badge bg-success rounded-pill">
+                                        @session.BasePrice ₴
+                                    </span>
+            
+                                </a>
+                            }
+                        </div>
                         }
                         else
                         {
