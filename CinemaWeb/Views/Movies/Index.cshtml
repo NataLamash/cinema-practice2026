@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Афіша";
 }
+<link rel="stylesheet" href="~/css/clientmovies.css" />
 
 <div class="container mt-5">
 
@@ -51,7 +52,8 @@
                 @foreach (var film in Model.ActualFilms)
                 {
                     <div class="col">
-                        <div class="card h-100 shadow-sm">
+                         <a asp-controller="Movies" asp-action="Details" asp-route-id="@film.Id" class="movie-card-link">
+                        <div class="card h-100 border-0 bg-light">
                             @if (!string.IsNullOrEmpty(film.PosterUrl))
                             {
                                 <img src="@film.PosterUrl" class="card-img-top" alt="@film.Name"
@@ -68,11 +70,10 @@
                                 <p class="card-text small text-muted">
                                     Тривалість: @film.DurationMinutes хв
                                 </p>
-                                <a asp-controller="Movies" asp-action="Details" asp-route-id="@film.Id" class="btn btn-primary">
-                                    Детальніше
-                                </a>
                             </div>
+                            
                         </div>
+                        </a>
                     </div>
                 }
             </div>
@@ -92,6 +93,7 @@
                 @foreach (var film in Model.ExpectedFilms)
                 {
                     <div class="col">
+                        <a asp-controller="Movies" asp-action="Details" asp-route-id="@film.Id" class="movie-card-link">
                         <div class="card h-100 border-0 bg-light">
                             <div style="position: relative;">
                                 @if (!string.IsNullOrEmpty(film.PosterUrl))
@@ -112,11 +114,9 @@
 
                             <div class="card-body">
                                 <h5 class="card-title text-truncate">@film.Name</h5>
-                                <a asp-controller="Movies" asp-action="Details" asp-route-id="@film.Id" class="btn btn-primary">
-                                    Детальніше
-                                </a>
                             </div>
                         </div>
+                        </a>
                     </div>
                 }
             </div>
