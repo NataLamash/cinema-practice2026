@@ -79,7 +79,7 @@ namespace CinemaWeb.Controllers
                         return Conflict(new { Message = "Місця вже заброньовано." });
                     }
 
-                    var status = await _context.OrderStatuses.FirstOrDefaultAsync(s => s.Name == "Зарезервовано")
+                    var status = await _context.OrderStatuses.FirstOrDefaultAsync(s => s.Name == "Заброньовано")
                                  ?? await _context.OrderStatuses.FirstAsync();
 
                     var order = new Order

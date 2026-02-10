@@ -4,6 +4,7 @@ using CinemaInfrastructure;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
 using Microsoft.EntityFrameworkCore.Metadata;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
@@ -11,9 +12,11 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace CinemaInfrastructure.Migrations
 {
     [DbContext(typeof(CinemaDbContext))]
-    partial class CinemaDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260209201715_RemoveSeedDataFromTheContext")]
+    partial class RemoveSeedDataFromTheContext
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
@@ -253,6 +256,26 @@ namespace CinemaInfrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("HallTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "Regular cinema hall",
+                            Name = "Standard"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "IMAX large format hall",
+                            Name = "IMAX"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "VIP hall with premium seats",
+                            Name = "VIP"
+                        });
                 });
 
             modelBuilder.Entity("CinemaDomain.Model.Order", b =>
@@ -377,6 +400,29 @@ namespace CinemaInfrastructure.Migrations
                     b.HasKey("Id");
 
                     b.ToTable("SeatTypes");
+
+                    b.HasData(
+                        new
+                        {
+                            Id = 1,
+                            Description = "Regular seat",
+                            MarkUpInPercentage = 0m,
+                            Name = "Standard"
+                        },
+                        new
+                        {
+                            Id = 2,
+                            Description = "More comfortable seat",
+                            MarkUpInPercentage = 15m,
+                            Name = "Comfort"
+                        },
+                        new
+                        {
+                            Id = 3,
+                            Description = "Premium seat",
+                            MarkUpInPercentage = 30m,
+                            Name = "VIP"
+                        });
                 });
 
             modelBuilder.Entity("CinemaDomain.Model.Session", b =>
