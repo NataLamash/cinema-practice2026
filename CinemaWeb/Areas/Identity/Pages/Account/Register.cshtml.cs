@@ -76,8 +76,8 @@ namespace CinemaWeb.Areas.Identity.Pages.Account
 
             [Required(ErrorMessage = "Поле '{0}' є обов'язковим.")]
             [DataType(DataType.Password)]
-            [Display(Name = "Підтвердження паролю")]
-            [Compare("Password", ErrorMessage = "Пароль та підтвердження паролю не співпадають.")]
+            [Display(Name = "Підтвердження пароля")]
+            [Compare("Password", ErrorMessage = "Пароль та підтвердження пароля не збігаються.")]
             public string ConfirmPassword { get; set; }
         }
 
