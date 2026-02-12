@@ -39,20 +39,20 @@
                                                asp-action="SelectSeats" 
                                                asp-route-sessionId="@session.SessionId" 
                                                class="text-decoration-none">
-                                            <div class="card h-100 border-0 shadow-sm text-center p-2">
-                                                <div class="fw-bold fs-3 text-primary line-height-1">
-                                                    @session.StartTime.ToString("HH:mm")
+                                                <div class="card h-100 border-0 shadow-sm text-center p-2">
+                                                    <div class="fw-bold fs-3 text-primary line-height-1">
+                                                        @session.StartTime.ToString("HH:mm")
+                                                    </div>
+                                                    <div class="text-uppercase fw-bold text-muted mt-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">
+                                                        @session.HallName
+                                                    </div>
+                                                    <div class="mt-2">
+                                                        <span class="badge bg-success py-1 px-2">@session.BasePrice ₴</span>
+                                                    </div>
+                                                    <div class="text-muted mt-1" style="font-size: 0.7rem;">
+                                                        @session.StartTime.ToString("dd MMM")
+                                                    </div>
                                                 </div>
-                                                <div class="text-uppercase fw-bold text-muted mt-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">
-                                                    @session.HallName
-                                                </div>
-                                                <div class="mt-2">
-                                                    <span class="badge bg-success py-1 px-2">@session.BasePrice ₴</span>
-                                                </div>
-                                                <div class="text-muted mt-1" style="font-size: 0.7rem;">
-                                                    @session.StartTime.ToString("dd MMM")
-                                                </div>
-                                            </div>
                                             </a>
                                         </div>
                                     }

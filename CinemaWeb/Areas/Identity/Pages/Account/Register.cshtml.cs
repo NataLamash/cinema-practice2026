@@ -47,36 +47,37 @@ namespace CinemaWeb.Areas.Identity.Pages.Account
 
         public class InputModel
         {
-            [Required(ErrorMessage = "Це обов'язкове поле.")]
-            [EmailAddress]
-            [Display(Name = "Електронна адреса")]
+            [Required(ErrorMessage = "Поле '{0}' є обов'язковим.")]
+            [EmailAddress(ErrorMessage = "Введіть коректну електронну адресу.")]
+            [Display(Name = "Електронна пошта")]
             public string Email { get; set; }
 
-            [Required(ErrorMessage = "Це обов'язкове поле.")]
+            [Required(ErrorMessage = "Поле '{0}' є обов'язковим.")]
             [Display(Name = "Ім'я")]
-            [StringLength(50)]
+            [StringLength(50, ErrorMessage = "{0} має бути мінімум {2} та максимум {1} символів.", MinimumLength = 2)]
             public string FirstName { get; set; }
 
-            [Required(ErrorMessage = "Це обов'язкове поле.")]
+            [Required(ErrorMessage = "Поле '{0}' є обов'язковим.")]
             [Display(Name = "Прізвище")]
-            [StringLength(50)]
+            [StringLength(50, ErrorMessage = "{0} має бути мінімум {2} та максимум {1} символів.", MinimumLength = 2)]
             public string LastName { get; set; }
 
-            [Required(ErrorMessage = "Це обов'язкове поле.")]
+            [Required(ErrorMessage = "Поле '{0}' є обов'язковим.")]
             [DataType(DataType.Date)]
             [Display(Name = "Дата народження")]
-            [BirthDate]
+            [BirthDate(ErrorMessage = "Некоректна дата народження (вік має бути від 14 років).")]
             public DateTime DateOfBirth { get; set; }
 
-            [Required(ErrorMessage = "Це обов'язкове поле.")]
-            [StringLength(100, ErrorMessage = "{0} має бути від {2} до {1} символів.", MinimumLength = 6)]
+            [Required(ErrorMessage = "Поле '{0}' є обов'язковим.")]
+            [StringLength(100, ErrorMessage = "{0} має бути мінімум {2} та максимум {1} символів.", MinimumLength = 6)]
             [DataType(DataType.Password)]
             [Display(Name = "Пароль")]
             public string Password { get; set; }
 
+            [Required(ErrorMessage = "Поле '{0}' є обов'язковим.")]
             [DataType(DataType.Password)]
-            [Display(Name = "Підтвердження пароля")]
-            [Compare("Password", ErrorMessage = "Пароль та підтвердження паролю не збігаються.")]
+            [Display(Name = "Підтвердження паролю")]
+            [Compare("Password", ErrorMessage = "Пароль та підтвердження паролю не співпадають.")]
             public string ConfirmPassword { get; set; }
         }
 
