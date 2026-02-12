@@ -35,6 +35,10 @@
                                     @foreach (var session in Model.UpcomingSessions)
                                     {
                                         <div class="col-6">
+                                            <a asp-controller="Booking" 
+                                               asp-action="SelectSeats" 
+                                               asp-route-sessionId="@session.SessionId" 
+                                               class="text-decoration-none">
                                             <div class="card h-100 border-0 shadow-sm text-center p-2">
                                                 <div class="fw-bold fs-3 text-primary line-height-1">
                                                     @session.StartTime.ToString("HH:mm")
