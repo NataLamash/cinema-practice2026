@@ -87,7 +87,7 @@ namespace CinemaWeb.Areas.Identity.Pages.Account
                 }
                 else
                 {
-                    ModelState.AddModelError(string.Empty, "Невалідні дані для входу (невірний логін або пароль).");
+                    ModelState.AddModelError(string.Empty, "Невалідні дані для входу (неправильний логін або пароль).");
                     return Page();
                 }
             }
