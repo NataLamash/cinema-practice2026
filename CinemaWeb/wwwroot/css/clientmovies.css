@@ -1,0 +1,23 @@
+.movie-card-link {
+    text-decoration: none; 
+    color: inherit; 
+    display: block; 
+    height: 100%; 
+}
+
+    .movie-card-link .card {
+        background-color: transparent; 
+        border: none; 
+        transition: all 0.3s ease;
+        backface-visibility: hidden;
+    }
+
+    .movie-card-link:hover .card {
+        background-color: rgba(0, 0, 0, 0.05);
+        transform: scale(1.03);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.1);
+    }
+
+    .movie-card-link img {
+        object-fit: cover;
+    }

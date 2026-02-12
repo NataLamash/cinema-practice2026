@@ -3,6 +3,7 @@
 @{
     ViewData["Title"] = "Афіша";
 }
+<link rel="stylesheet" href="~/css/clientmovies.css" />
 
 <div class="container mt-5">
     <div class="row mb-4">
@@ -48,26 +49,27 @@
                 @foreach (var film in Model.ActualFilms)
                 {
                     <div class="col">
-                        <a asp-controller="Movies" asp-action="Details" asp-route-id="@film.Id" class="text-decoration-none text-dark card-link">
-                            <div class="card h-100 shadow-sm border-0 transition-hover">
-                                <div class="position-relative overflow-hidden rounded-top">
-                                    @if (!string.IsNullOrEmpty(film.PosterUrl))
-                                    {
-                                        <img src="@film.PosterUrl" class="card-img-top" alt="@film.Name"
-                                             style="height: 380px; object-fit: cover;">
-                                    }
-                                    else
-                                    {
-                                        <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 380px;">
-                                            <span class="text-muted">Постер відсутній</span>
-                                        </div>
-                                    }
+                         <a asp-controller="Movies" asp-action="Details" asp-route-id="@film.Id" class="movie-card-link">
+                        <div class="card h-100 border-0 bg-light">
+                            @if (!string.IsNullOrEmpty(film.PosterUrl))
+                            {
+                                <img src="@film.PosterUrl" class="card-img-top" alt="@film.Name"
+                                     style="height: 350px; object-fit: cover;">
+                            }
+                            else
+                            {
+                                <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 350px;">
+                                    <span>Постер відсутній</span>
                                 </div>
-                                <div class="card-body text-center">
-                                    <h5 class="card-title fw-bold mb-1 text-truncate" title="@film.Name">@film.Name</h5>
-                                    <p class="card-text small text-muted">@film.DurationMinutes хв</p>
-                                </div>
+                            }
+                            <div class="card-body d-flex flex-column">
+                                <h5 class="card-title text-truncate" title="@film.Name">@film.Name</h5>
+                                <p class="card-text small text-muted">
+                                    Тривалість: @film.DurationMinutes хв
+                                </p>
                             </div>
+                            
+                        </div>
                         </a>
                     </div>
                 }
@@ -87,22 +89,29 @@
                 @foreach (var film in Model.ExpectedFilms)
                 {
                     <div class="col">
-                        <a asp-controller="Movies" asp-action="Details" asp-route-id="@film.Id" class="text-decoration-none text-dark">
-                            <div class="card h-100 border-0 bg-light shadow-sm transition-hover">
-                                <div class="position-relative">
-                                    @if (!string.IsNullOrEmpty(film.PosterUrl))
-                                    {
-                                        <img src="@film.PosterUrl" class="card-img-top" alt="@film.Name"
-                                             style="height: 380px; object-fit: cover; filter: grayscale(30%);">
-                                    }
-                                    <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2 shadow-sm">
-                                        @(film.ReleaseDate.HasValue ? film.ReleaseDate.Value.ToString("dd.MM.yyyy") : "Скоро")
-                                    </span>
-                                </div>
-                                <div class="card-body text-center">
-                                    <h5 class="card-title fw-bold text-truncate">@film.Name</h5>
-                                </div>
+                        <a asp-controller="Movies" asp-action="Details" asp-route-id="@film.Id" class="movie-card-link">
+                        <div class="card h-100 border-0 bg-light">
+                            <div style="position: relative;">
+                                @if (!string.IsNullOrEmpty(film.PosterUrl))
+                                {
+                                    <img src="@film.PosterUrl" class="card-img-top" alt="@film.Name"
+                                         style="height: 350px; object-fit: cover; filter: grayscale(40%);">
+                                }
+                                else
+                                {
+                                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 350px;">
+                                        <span>No Poster</span>
+                                    </div>
+                                }
+                                <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">
+                                    @(film.ReleaseDate.HasValue? film.ReleaseDate.Value.ToString("dd.MM.yyyy") : "Скоро")
+                                </span>
                             </div>
+
+                            <div class="card-body">
+                                <h5 class="card-title text-truncate">@film.Name</h5>
+                            </div>
+                        </div>
                         </a>
                     </div>
                 }
