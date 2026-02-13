@@ -6,46 +6,73 @@
     var session = firstTicket?.Session;
     var filmTitle = session?.Film?.Name ?? "";
     var hallName = session?.Hall?.Name ?? "";
+    var total = Model.Tickets.Sum(x => x.PurchasePrice);
 }
 
-<div class="container mt-4">
-    <h2 class="mb-3">Підтвердження бронювання</h2>
+<div class="container app-page confirm-page">
+    <div class="section">
+        <div class="section-head">
+            <h2 class="section-title">Підтвердження бронювання</h2>
+        </div>
 
-    <div class="card mb-3">
-        <div class="card-body">
-            <div><strong>Замовлення #:</strong> @Model.Id</div>
-            <div><strong>Статус:</strong> @Model.Status?.Name</div>
-            <div><strong>Дата:</strong> @Model.OrderDate</div>
-            <div><strong>Фільм:</strong> @filmTitle</div>
-            <div><strong>Зал:</strong> @hallName</div>
-            <div><strong>Сума:</strong> @Model.TotalPrice</div>
+        <div class="confirm-shell">
+            <div class="confirm-hero">
+                <div class="confirm-hero-left">
+                    <div class="confirm-kicker">Готово</div>
+                    <div class="confirm-title">Замовлення #@Model.Id</div>
+                    <div class="confirm-sub">
+                        <span>@filmTitle</span>
+                        <span class="dot">•</span>
+                        <span>@hallName</span>
+                    </div>
+                </div>
+                <div class="confirm-hero-right">
+                    <div class="confirm-badge">@Model.Status?.Name</div>
+                    <div class="confirm-total">@total</div>
+                    <div class="confirm-muted">загальна сума</div>
+                </div>
+            </div>
+
+            <div class="confirm-grid">
+                <div class="confirm-box">
+                    <div class="confirm-box-label">Дата</div>
+                    <div class="confirm-box-value">@Model.OrderDate</div>
+                </div>
+                <div class="confirm-box">
+                    <div class="confirm-box-label">Фільм</div>
+                    <div class="confirm-box-value">@filmTitle</div>
+                </div>
+                <div class="confirm-box">
+                    <div class="confirm-box-label">Зал</div>
+                    <div class="confirm-box-value">@hallName</div>
+                </div>
+                <div class="confirm-box">
+                    <div class="confirm-box-label">Квитків</div>
+                    <div class="confirm-box-value">@Model.Tickets.Count</div>
+                </div>
+            </div>
+
+            <div class="confirm-tickets">
+                <div class="confirm-tickets-title">Квитки</div>
+
+                <div class="confirm-ticket-list">
+                    @foreach (var t in Model.Tickets.OrderBy(x => x.Seat.Row).ThenBy(x => x.Seat.NumberInRow))
+                    {
+                        <div class="confirm-ticket">
+                            <div class="confirm-ticket-main">
+                                <div class="confirm-ticket-seat">Ряд @t.Seat.Row, місце @t.Seat.NumberInRow</div>
+                                <div class="confirm-ticket-type">@t.Seat.SeatType?.Name</div>
+                            </div>
+                            <div class="confirm-ticket-price">@t.PurchasePrice</div>
+                        </div>
+                    }
+                </div>
+
+                <div class="confirm-actions">
+                    <a class="btn app-btn-primary" asp-controller="Account" asp-action="Orders">Перейти до моїх замовлень</a>
+                    <a class="btn app-btn-outline" asp-controller="Movies" asp-action="Index">До афіші</a>
+                </div>
+            </div>
         </div>
     </div>
-
-    <h5>Квитки</h5>
-    <table class="table table-bordered">
-        <thead>
-            <tr>
-                <th>Ряд</th>
-                <th>Місце</th>
-                <th>Тип</th>
-                <th>Ціна</th>
-            </tr>
-        </thead>
-        <tbody>
-            @foreach (var t in Model.Tickets.OrderBy(x => x.Seat.Row).ThenBy(x => x.Seat.NumberInRow))
-            {
-                <tr>
-                    <td>@t.Seat.Row</td>
-                    <td>@t.Seat.NumberInRow</td>
-                    <td>@t.Seat.SeatType?.Name</td>
-                    <td>@t.PurchasePrice</td>
-                </tr>
-            }
-        </tbody>
-    </table>
-
-    <a class="btn btn-primary" asp-controller="Account" asp-action="Orders">
-        Перейти до моїх замовлень
-    </a>
 </div>

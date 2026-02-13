@@ -1,37 +1,69 @@
-using System.Diagnostics;
-using CinemaWeb.Models;
+using CinemaInfrastructure;
+using CinemaWeb.ViewModels.Home;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.EntityFrameworkCore;
+using System;
+using System.Linq;
+using System.Threading.Tasks;
 
 namespace CinemaWeb.Controllers
 {
     public class HomeController : Controller
     {
-        private readonly ILogger<HomeController> _logger;
+        private readonly CinemaDbContext _context;
 
-        public HomeController(ILogger<HomeController> logger)
+        public HomeController(CinemaDbContext context)
         {
-            _logger = logger;
+            _context = context;
         }
 
-        public IActionResult Index()
+        public async Task<IActionResult> Index()
         {
-            return View();
+            var today = DateTime.Today;
+            var tomorrow = today.AddDays(1);
+
+            var todayFilms = await _context.Films
+                .AsNoTracking()
+                .Where(f => f.Sessions.Any(s => s.StartTime >= today && s.StartTime < tomorrow))
+                .OrderByDescending(f => f.ReleaseDate)
+                .ThenByDescending(f => f.Id)
+                .Take(1)
+                .Select(f => new FilmCardVm
+                {
+                    Id = f.Id,
+                    Name = f.Name,
+                    PosterUrl = f.PosterUrl,
+                    ReleaseDate = f.ReleaseDate
+                })
+                .ToListAsync();
+
+            var actualFilms = await _context.Films
+                .AsNoTracking()
+                .OrderByDescending(f => f.ReleaseDate)
+                .ThenByDescending(f => f.Id)
+                .Take(12)
+                .Select(f => new FilmCardVm
+                {
+                    Id = f.Id,
+                    Name = f.Name,
+                    PosterUrl = f.PosterUrl,
+                    ReleaseDate = f.ReleaseDate
+                })
+                .ToListAsync();
+
+            var vm = new HomeIndexVm
+            {
+                TodayFilms = todayFilms,
+                ActualFilms = actualFilms
+            };
+
+            return View(vm);
         }
+
 
         public IActionResult Privacy()
         {
             return View();
-        }
-
-        public IActionResult AccessDenied()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
         }
     }
 }

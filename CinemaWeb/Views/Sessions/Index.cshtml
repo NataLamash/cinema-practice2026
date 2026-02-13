@@ -5,36 +5,44 @@
     ViewData["Title"] = "Найближчі сеанси";
 
     var selectedDate = ViewBag.CurrentDate as DateTime?;
-    
-    var availableDates = Enumerable.Range(0, 7)
-        .Select(i => DateTime.Now.Date.AddDays(i))
-        .ToList();
+    var availableDates = Enumerable.Range(0, 7).Select(i => DateTime.Now.Date.AddDays(i)).ToList();
+    var culture = new CultureInfo("uk-UA");
+
+    string PosterOrPlaceholder(string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url)) return Url.Content("~/img/poster-placeholder.jpg");
+        var u = url.Trim();
+        if (u.StartsWith("http", StringComparison.OrdinalIgnoreCase)) return u;
+        if (u.StartsWith("/")) return u;
+        return Url.Content("~/" + u.TrimStart('/'));
+    }
+
+    string Money(decimal v) => v.ToString("0.##", CultureInfo.InvariantCulture);
 }
 
-<div class="container mt-4">
-    <h2>Найближчі сеанси</h2>
+<div class="container app-page sessions-page">
+    <div class="sessions-top">
+        <div>
+            <h1 class="sessions-title">Найближчі сеанси</h1>
+            <div class="sessions-subtitle">Обери фільм або дату — і купуй квиток за 2 кліки.</div>
+        </div>
 
-    <form method="get" class="mb-3">
-    <div class="row align-items-center">
-        <div class="col-md-4">
+        <form method="get" class="sessions-filter">
             @if (ViewBag.CurrentDate != null)
             {
-                <input type="hidden" name="filterDate" 
-                       value="@(((DateTime)ViewBag.CurrentDate).ToString("yyyy-MM-dd"))" />
+                <input type="hidden" name="filterDate" value="@(((DateTime)ViewBag.CurrentDate).ToString("yyyy-MM-dd"))" />
             }
 
-            <select name="filmId" class="form-control" onchange="this.form.submit()" 
-                    asp-items="ViewBag.FilmList">
-                <option value="">-- Всі фільми --</option>
+            <select name="filmId" class="form-select sessions-select" onchange="this.form.submit()" asp-items="ViewBag.FilmList">
+                <option value="">Всі фільми</option>
             </select>
-        </div>
+        </form>
     </div>
-    </form>
 
-    <ul class="nav nav-pills mb-4 mt-3">
+    <ul class="nav sessions-dates">
         <li class="nav-item">
-            <a class="nav-link @(selectedDate == null ? "active" : "")" 
-               asp-action="Index" 
+            <a class="nav-link sessions-date-link @(selectedDate == null ? "active" : "")"
+               asp-action="Index"
                asp-route-filterDate=""
                asp-route-filmId="@ViewBag.CurrentFilmId">
                 Всі
@@ -44,14 +52,13 @@
         @foreach (var date in availableDates)
         {
             var isActive = selectedDate.HasValue && selectedDate.Value.Date == date;
-            
+
             <li class="nav-item">
-                <a class="nav-link @(isActive ? "active" : "")" 
-                   asp-action="Index" 
+                <a class="nav-link sessions-date-link @(isActive ? "active" : "")"
+                   asp-action="Index"
                    asp-route-filterDate="@date.ToString("yyyy-MM-dd")"
                    asp-route-filmId="@ViewBag.CurrentFilmId">
-                   
-                   @date.ToString("ddd, dd.MM", new CultureInfo("uk-UA"))
+                    @date.ToString("ddd, dd.MM", culture)
                 </a>
             </li>
         }
@@ -59,53 +66,68 @@
 
     @if (!Model.Any())
     {
-        <div class="alert alert-info">
+        <div class="sessions-empty">
             На цей період запланованих сеансів немає.
         </div>
     }
     else
     {
-        @foreach (var group in Model.GroupBy(s => s.StartTime.Date))
+        @foreach (var dayGroup in Model.GroupBy(s => s.StartTime.Date).OrderBy(g => g.Key))
         {
-            <div class="mb-5">
-                <h4 class="bg-light p-2 border-left border-primary text-primary">
-                    @group.Key.ToString("D", new CultureInfo("uk-UA"))
-                </h4>
+            <section class="sessions-day">
+                <div class="sessions-day-head">
+                    @dayGroup.Key.ToString("D", culture)
+                </div>
 
-                <table class="table table-hover table-bordered">
-                    <thead class="thead-light">
-                        <tr>
-                            <th>Час початку</th>
-                            <th>Фільм</th>
-                            <th>Зал</th>
-                            <th>Ціна</th>
-                            <th>Дії</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        @foreach (var item in group.OrderBy(s => s.StartTime))
-                        {
-                            <tr>
-                                <td class="font-weight-bold" style="width: 100px;">
-                                    @item.StartTime.ToString("HH:mm")
-                                </td>
-                                <td class="font-weight-bold">
-                                    <a asp-controller="Movies" asp-action="Details" asp-route-id="@item.FilmId" class="text-dark">
-                                    @item.FilmName
-                                    </a>
-                                </td>
-                                <td>@item.HallName</td>
-                                <td>від @item.BasePrice UAH</td>
-                                <td>
-                                    <a asp-controller="Booking" asp-action="SelectSeats" asp-route-sessionId="@item.Id" class="btn btn-primary">
-                                        Придбати квиток
-                                    </a>
-                                </td>
-                            </tr>
-                        }
-                    </tbody>
-                </table>
-            </div>
+                <div class="sessions-grid">
+                    @foreach (var filmGroup in dayGroup.GroupBy(x => new { x.FilmId, x.FilmName }).OrderBy(g => g.Key.FilmName))
+                    {
+                        var first = filmGroup.First();
+                        var poster = PosterOrPlaceholder(first.PosterUrl);
+
+                        decimal minPrice = 0;
+                        try { minPrice = filmGroup.Min(x => x.BasePrice); } catch { minPrice = 0; }
+
+                        <div class="sessions-card">
+                            <a class="sessions-poster"
+                               style="--poster:url('@poster');"
+                               asp-controller="Movies"
+                               asp-action="Details"
+                               asp-route-id="@filmGroup.Key.FilmId"
+                               aria-label="@filmGroup.Key.FilmName">
+                            </a>
+
+                            <div class="sessions-info">
+                                <a class="sessions-film-title"
+                                   asp-controller="Movies"
+                                   asp-action="Details"
+                                   asp-route-id="@filmGroup.Key.FilmId">
+                                    @filmGroup.Key.FilmName
+                                </a>
+
+                                <div class="sessions-times">
+                                    @foreach (var item in filmGroup.OrderBy(s => s.StartTime))
+                                    {
+                                        <a class="sessions-time"
+                                           asp-controller="Booking"
+                                           asp-action="SelectSeats"
+                                           asp-route-sessionId="@item.Id">
+                                            <div class="sessions-time-top">@item.StartTime.ToString("HH:mm")</div>
+                                            <div class="sessions-time-sub">@item.HallName</div>
+                                        </a>
+                                    }
+                                </div>
+
+                                <div class="sessions-meta">
+                                    <span class="sessions-price">
+                                        від @Money(minPrice) ₴
+                                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    }
+                </div>
+            </section>
         }
     }
 </div>

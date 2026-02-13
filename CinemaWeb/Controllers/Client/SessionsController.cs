@@ -52,10 +52,12 @@ namespace CinemaWeb.Controllers.Client
                 .Select(s => new ClientSessionViewModel
                 {
                     Id = s.Id,
-                    FilmName = s.Film.Name, 
+                    FilmName = s.Film.Name,
+                    FilmId = s.FilmId,
                     HallName = s.Hall.Name, 
                     StartTime = s.StartTime,
-                    BasePrice = s.BasePrice
+                    BasePrice = s.BasePrice,
+                    PosterUrl = s.Film.PosterUrl
                 })
             .ToListAsync();
 

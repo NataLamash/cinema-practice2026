@@ -1,8 +1,119 @@
-﻿@{
-    ViewData["Title"] = "Home Page";
+@model CinemaWeb.ViewModels.Home.HomeIndexVm
+
+@{
+    ViewData["Title"] = "Головна";
+
+    string PosterOrPlaceholder(string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url)) return Url.Content("~/img/poster-placeholder.jpg");
+        var u = url.Trim();
+        if (u.StartsWith("http", StringComparison.OrdinalIgnoreCase)) return u;
+        if (u.StartsWith("/")) return u;
+        return Url.Content("~/" + u.TrimStart('/'));
+    }
 }
 
-<div class="text-center">
-    <h1 class="display-4">Welcome</h1>
-    <p>Learn about <a href="https://learn.microsoft.com/aspnet/core">building Web apps with ASP.NET Core</a>.</p>
+<div class="container app-page">
+    <div class="hero">
+        <div class="hero-inner">
+            <div>
+                <h1 class="hero-title">Mystic Reel — бронюй місця за хвилину</h1>
+                <p class="hero-subtitle">Нові прем’єри, зручні зали, швидке бронювання.</p>
+
+                <div class="hero-actions">
+                    <a class="btn app-btn-primary" asp-controller="Sessions" asp-action="Index">Розклад сеансів</a>
+                    <a class="btn app-btn-outline" asp-controller="Movies" asp-action="Index">Усі фільми</a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="section">
+        <div class="section-head">
+            <h2 class="section-title">Актуальні</h2>
+            <a class="section-link" asp-controller="Sessions" asp-action="Index">Перейти до розкладу →</a>
+        </div>
+
+        <div class="film-slider-wrap">
+            <button class="slider-arrow left" type="button" data-target="actualSlider" aria-label="prev">
+                <span>‹</span>
+            </button>
+
+            <div class="film-slider" id="actualSlider">
+                @foreach (var f in Model.ActualFilms)
+                {
+                    <a class="film-card"
+                       style="--poster:url('@PosterOrPlaceholder(f.PosterUrl)');"
+                       asp-controller="Movies"
+                       asp-action="Details"
+                       asp-route-id="@f.Id">
+                        <div class="film-card-overlay">
+                            <div class="film-card-title">@f.Name</div>
+                        </div>
+                    </a>
+                }
+            </div>
+
+            <button class="slider-arrow right" type="button" data-target="actualSlider" aria-label="next">
+                <span>›</span>
+            </button>
+        </div>
+
+        <h3 class="tech-head">Зручності кінотеатру</h3>
+
+        <div class="tech-grid">
+            <div class="tech-card">
+                <div class="tech-ico tech-ico-purple">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3c-5 0-9 4-9 9v6h4v3h2v-3h6v3h2v-3h4v-6c0-5-4-9-9-9zm7 13H5v-4c0-3.9 3.1-7 7-7s7 3.1 7 7v4z" /></svg>
+                </div>
+                <div class="tech-title">Dolby Atmos</div>
+                <p class="tech-text">Об’ємний звук і повне занурення.</p>
+            </div>
+
+            <div class="tech-card">
+                <div class="tech-ico tech-ico-purple">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 7h10l2 3v2H5v-2l2-3zm-2 7h14v7H5v-7zm4 2v3h2v-3H9zm4 0v3h2v-3h-2z" /></svg>
+                </div>
+                <div class="tech-title">3D</div>
+                <p class="tech-text">Яскраве 3D-зображення на великому екрані.</p>
+            </div>
+
+            <div class="tech-card">
+                <div class="tech-ico tech-ico-purple">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 11V8c0-2.2 1.8-4 4-4h8c2.2 0 4 1.8 4 4v3h-2V8c0-1.1-.9-2-2-2H8c-1.1 0-2 .9-2 2v3H4zm0 2h16v6c0 1.1-.9 2-2 2H6c-1.1 0-2-.9-2-2v-6zm4 2v4h2v-4H8zm6 0v4h2v-4h-2z" /></svg>
+                </div>
+                <div class="tech-title">Comfort</div>
+                <p class="tech-text">Зручні крісла та акуратні зали.</p>
+            </div>
+
+            <div class="tech-card">
+                <div class="tech-ico tech-ico-purple">
+                    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M13 2L3 14h7l-1 8 12-14h-7l-1-6z" /></svg>
+                </div>
+                <div class="tech-title">Швидке бронювання</div>
+                <p class="tech-text">Обрав місця — отримав підтвердження.</p>
+            </div>
+        </div>
+    </div>
 </div>
+
+@section Scripts {
+    <script>
+        (function () {
+            function scrollSlider(id, dir) {
+                const el = document.getElementById(id);
+                if (!el) return;
+                const step = Math.min(420, el.clientWidth * 0.85);
+                el.scrollBy({ left: dir * step, behavior: "smooth" });
+            }
+
+            document.querySelectorAll(".slider-arrow").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    const target = btn.getAttribute("data-target");
+                    const dir = btn.classList.contains("left") ? -1 : 1;
+                    scrollSlider(target, dir);
+                });
+            });
+        })();
+    </script>
+}

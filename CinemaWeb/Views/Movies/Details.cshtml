@@ -3,53 +3,58 @@
     ViewData["Title"] = Model.Title;
 }
 
-<div class="container mt-4 mb-5">
-    <div class="card shadow-lg border-0 overflow-hidden">
-        <div class="card-header bg-dark text-white d-flex justify-content-between align-items-center py-3">
-            <h2 class="mb-0 fw-bold">@Model.Title</h2>
-            <span class="badge bg-warning text-dark fs-6 px-3">@(Model.AllowedMinAge ?? 0)+</span>
+<div class="container app-page" style="padding-bottom:28px;">
+    <div style="border-radius:22px; overflow:hidden; background:rgba(255,255,255,0.03); border:1px solid rgba(255,255,255,0.08); box-shadow:0 18px 45px rgba(0,0,0,0.35);">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 18px; background:rgba(11,18,32,0.70); border-bottom:1px solid rgba(255,255,255,0.08);">
+            <h2 style="margin:0; font-weight:800; color:rgba(232,236,243,0.96);">@Model.Title</h2>
+            <span style="display:inline-flex; align-items:center; border-radius:999px; padding:6px 12px; font-weight:800; border:1px solid rgba(124,58,237,0.45); background:rgba(124,58,237,0.16); color:rgba(232,236,243,0.95);">
+                @(Model.AllowedMinAge ?? 0)+
+            </span>
         </div>
 
-        <div class="card-body p-4">
+        <div style="padding:18px;">
             <div class="row">
                 <div class="col-md-4">
-                    <div class="text-center mb-4">
+                    <div style="border-radius:18px; overflow:hidden; border:1px solid rgba(255,255,255,0.10); background:rgba(255,255,255,0.03);">
                         @if (!string.IsNullOrEmpty(Model.PosterUrl))
                         {
-                            <img src="@Model.PosterUrl" alt="@Model.Title" class="img-fluid rounded shadow-sm w-100" style="max-height: 550px; object-fit: cover;" />
+                            <img src="@Model.PosterUrl" alt="@Model.Title" class="img-fluid w-100" style="max-height: 550px; object-fit: cover;" />
                         }
                         else
                         {
-                            <div class="bg-light py-5 rounded text-muted border">Постер недоступний</div>
+                            <div style="padding:26px; color:rgba(232,236,243,0.60); text-align:center;">Постер недоступний</div>
                         }
                     </div>
 
-                    <div class="card border-0 bg-light">
-                        <div class="card-header bg-secondary text-white fw-bold text-center border-0">
+                    <div style="margin-top:14px; border-radius:18px; overflow:hidden; border:1px solid rgba(255,255,255,0.10); background:rgba(11,18,32,0.55);">
+                        <div style="padding:12px 14px; font-weight:800; color:rgba(232,236,243,0.95); border-bottom:1px solid rgba(255,255,255,0.10);">
                             Найближчі сеанси
                         </div>
-                        <div class="card-body p-3">
+
+                        <div style="padding:12px;">
                             @if (Model.UpcomingSessions.Any())
                             {
                                 <div class="row g-2">
                                     @foreach (var session in Model.UpcomingSessions)
                                     {
                                         <div class="col-6">
-                                            <a asp-controller="Booking" 
-                                               asp-action="SelectSeats" 
-                                               asp-route-sessionId="@session.SessionId" 
-                                               class="text-decoration-none">
-                                                <div class="card h-100 border-0 shadow-sm text-center p-2">
-                                                    <div class="fw-bold fs-3 text-primary line-height-1">
+                                            <a asp-controller="Booking"
+                                               asp-action="SelectSeats"
+                                               asp-route-sessionId="@session.SessionId"
+                                               style="text-decoration:none;">
+                                                <div style="height:100%; border-radius:16px; padding:10px; border:1px solid rgba(255,255,255,0.10); background:rgba(255,255,255,0.03); text-align:center;">
+                                                    <div style="font-weight:900; font-size:30px; line-height:1.1; color:rgba(232,236,243,0.96);">
                                                         @session.StartTime.ToString("HH:mm")
                                                     </div>
-                                                    <div class="text-uppercase fw-bold text-muted mt-1" style="font-size: 0.65rem; letter-spacing: 0.5px;">
+                                                    <div style="margin-top:4px; font-weight:800; letter-spacing:.4px; text-transform:uppercase; font-size:10px; color:rgba(232,236,243,0.60);">
                                                         @session.HallName
                                                     </div>
-                                                    <div class="mt-2">
-                                                        <span class="badge bg-success py-1 px-2">@session.BasePrice ₴</span>
+                                                    <div style="margin-top:8px;">
+                                                        <span style="display:inline-flex; border-radius:999px; padding:6px 10px; font-weight:800; border:1px solid rgba(124,58,237,0.45); background:rgba(124,58,237,0.16); color:rgba(232,236,243,0.95);">
+                                                            @session.BasePrice ₴
+                                                        </span>
                                                     </div>
-                                                    <div class="text-muted mt-1" style="font-size: 0.7rem;">
+                                                    <div style="margin-top:6px; font-size:11px; color:rgba(232,236,243,0.55);">
                                                         @session.StartTime.ToString("dd MMM")
                                                     </div>
                                                 </div>
@@ -60,38 +65,41 @@
                             }
                             else
                             {
-                                <div class="text-center text-muted py-3 small">На жаль, активних сеансів немає.</div>
+                                <div style="text-align:center; color:rgba(232,236,243,0.60); padding:10px;">На жаль, активних сеансів немає.</div>
                             }
                         </div>
-                        <div class="card-footer bg-transparent border-0 text-center pb-3">
-                            <a asp-controller="Sessions" asp-action="Index" asp-route-filmId="@Model.Id"
-                               class="btn btn-sm btn-outline-dark w-100">
-                                <i class="bi bi-calendar3"></i> Повний розклад
+
+                        <div style="padding:12px; border-top:1px solid rgba(255,255,255,0.10);">
+                            <a asp-controller="Sessions" asp-action="Index" asp-route-filmId="@Model.Id" class="btn app-btn-outline w-100">
+                                Повний розклад
                             </a>
                         </div>
                     </div>
                 </div>
 
                 <div class="col-md-8 px-md-4">
-                    <h4 class="fw-bold mb-3 border-bottom pb-2">Про фільм</h4>
-                    <dl class="row">
-                        <dt class="col-sm-3 text-muted">Опис</dt>
+                    <h4 style="font-weight:900; margin:0 0 12px 0; padding-bottom:10px; border-bottom:1px solid rgba(255,255,255,0.10); color:rgba(232,236,243,0.96);">
+                        Про фільм
+                    </h4>
+
+                    <dl class="row" style="color:rgba(232,236,243,0.92);">
+                        <dt class="col-sm-3" style="color:rgba(232,236,243,0.60);">Опис</dt>
                         <dd class="col-sm-9 mb-4">@(string.IsNullOrEmpty(Model.Description) ? "Опис відсутній." : Model.Description)</dd>
 
-                        <dt class="col-sm-3 text-muted">Дата виходу</dt>
+                        <dt class="col-sm-3" style="color:rgba(232,236,243,0.60);">Дата виходу</dt>
                         <dd class="col-sm-9">@(Model.ReleaseDate?.ToString("d MMMM, yyyy") ?? "Невідомо")</dd>
 
-                        <dt class="col-sm-3 text-muted">Тривалість</dt>
+                        <dt class="col-sm-3" style="color:rgba(232,236,243,0.60);">Тривалість</dt>
                         <dd class="col-sm-9">@Model.DurationMinutes хв.</dd>
 
-                        <dt class="col-sm-3 text-muted">Продюсер</dt>
+                        <dt class="col-sm-3" style="color:rgba(232,236,243,0.60);">Продюсер</dt>
                         <dd class="col-sm-9">@(Model.ProducerName ?? "Не вказано")</dd>
 
-                        <dt class="col-sm-3 text-muted mt-2">Жанри</dt>
+                        <dt class="col-sm-3 mt-2" style="color:rgba(232,236,243,0.60);">Жанри</dt>
                         <dd class="col-sm-9 mt-2">
                             @foreach (var genre in Model.Genres)
                             {
-                                <span class="badge bg-outline-secondary border text-dark me-1">@genre</span>
+                                <span class="badge-soft muted" style="margin-right:6px;">@genre</span>
                             }
                         </dd>
                     </dl>
@@ -99,8 +107,8 @@
                     @if (!string.IsNullOrEmpty(Model.TrailerEmbedUrl))
                     {
                         <div class="mt-4">
-                            <h5 class="fw-bold mb-3"><i class="bi bi-play-circle-fill"></i> Трейлер</h5>
-                            <div class="ratio ratio-16x9 rounded shadow-sm overflow-hidden">
+                            <h5 style="font-weight:900; margin-bottom:12px; color:rgba(232,236,243,0.96);">Трейлер</h5>
+                            <div class="ratio ratio-16x9" style="border-radius:18px; overflow:hidden; border:1px solid rgba(255,255,255,0.10); box-shadow:0 18px 45px rgba(0,0,0,0.35);">
                                 <iframe src="@Model.TrailerEmbedUrl" allowfullscreen></iframe>
                             </div>
                         </div>
@@ -109,16 +117,8 @@
             </div>
         </div>
 
-        <div class="card-footer bg-light p-3 text-end">
-            <a asp-action="Index" class="btn btn-outline-secondary">
-                <i class="bi bi-arrow-left"></i> Назад до афіші
-            </a>
+        <div style="padding:14px 18px; background:rgba(255,255,255,0.03); border-top:1px solid rgba(255,255,255,0.08); text-align:right;">
+            <a asp-action="Index" class="btn app-btn-outline">Назад до афіші</a>
         </div>
     </div>
 </div>
-
-<style>
-    .line-height-1 {
-        line-height: 1.1;
-    }
-</style>

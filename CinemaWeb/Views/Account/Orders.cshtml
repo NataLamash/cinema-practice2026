@@ -4,50 +4,40 @@
     ViewData["Title"] = "Мої замовлення";
 }
 
-<div class="container mt-4">
-    <h2>Історія замовлень</h2>
-    <hr />
+<div class="container app-page">
+    <div class="section-head">
+        <h2 class="section-title">Мої замовлення</h2>
+    </div>
 
     @if (!Model.Any())
     {
-        <div class="alert alert-info">
-            У вас поки немає замовлень. <a asp-controller="Home" asp-action="Index">Купити квитки</a>
+        <div class="hero-note">
+            У вас поки немає замовлень.
+            <a class="hero-mini-cta" asp-controller="Home" asp-action="Index">Купити квитки</a>
         </div>
     }
     else
     {
-        <table class="table table-hover table-bordered">
-            <thead class="table-light">
-                <tr>
-                    <th>#</th>
-                    <th>Дата створення</th>
-                    <th>Статус</th>
-                    <th>Квитків</th>
-                    <th>Сума</th>
-                    <th>Дії</th>
-                </tr>
-            </thead>
-            <tbody>
-                @foreach (var order in Model)
-                {
-                    <tr>
-                        <td>@order.Id</td>
-                        <td>@order.OrderDate.ToString("g")</td>
-                        <td>
-                            <span class="badge @(order.Status == "Paid" ? "bg-success" : "bg-secondary")">
-                                @order.Status
-                            </span>
-                        </td>
-                        <td>@order.TicketsCount</td>
-                        <td>@order.TotalPrice.ToString("C")</td>
-                        <td>
-                            <a asp-action="OrderDetails" asp-route-id="@order.Id" class="btn btn-primary btn-sm">
-                                Деталі
-                            </a>
-                        </td>
-                    </tr>
-                }
-            </tbody>
-        </table>
+        <div class="tech-grid" style="grid-template-columns: repeat(3, minmax(0,1fr));">
+            @foreach (var order in Model)
+            {
+                <div class="tech-card" style="display:flex; flex-direction:column; gap:10px;">
+                    <div style="display:flex; justify-content:space-between; align-items:center; gap:10px;">
+                        <div style="font-weight:800;">Замовлення #@order.Id</div>
+                        <span class="badge-soft @(order.Status == "Paid" ? "success" : "muted")">@order.Status</span>
+                    </div>
+
+                    <div style="color:rgba(232,236,243,0.70);">
+                        <div>Дата: @order.OrderDate.ToString("g")</div>
+                        <div>Квитків: @order.TicketsCount</div>
+                        <div>Сума: @order.TotalPrice.ToString("C")</div>
+                    </div>
+
+                    <div style="margin-top:auto;">
+                        <a class="btn app-btn-primary w-100" asp-action="OrderDetails" asp-route-id="@order.Id">Деталі</a>
+                    </div>
+                </div>
+            }
+        </div>
     }
 </div>

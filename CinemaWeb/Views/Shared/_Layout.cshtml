@@ -1,86 +1,57 @@
+@using System.Security.Claims
 <!DOCTYPE html>
-<html lang="en">
+<html lang="uk">
 <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>@ViewData["Title"] - CinemaWeb</title>
-    <script type="importmap"></script>
+    <title>@ViewData["Title"] - Mystic Reel</title>
     <link rel="stylesheet" href="~/lib/bootstrap/dist/css/bootstrap.min.css" />
     <link rel="stylesheet" href="~/css/site.css" asp-append-version="true" />
-    <link rel="stylesheet" href="~/CinemaWeb.styles.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/app.css" asp-append-version="true" />
+    <link rel="stylesheet" href="~/css/movies-grid.css" asp-append-version="true" />
 </head>
-<body>
-    <header>
-        <nav class="navbar navbar-expand-sm navbar-toggleable-sm navbar-light bg-white border-bottom box-shadow mb-3">
-            <div class="container-fluid">
-                <a class="navbar-brand" asp-area="" asp-controller="Home" asp-action="Index">CinemaWeb</a>
-                <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target=".navbar-collapse" aria-controls="navbarSupportedContent"
-                        aria-expanded="false" aria-label="Toggle navigation">
-                    <span class="navbar-toggler-icon"></span>
-                </button>
-                <div class="navbar-collapse collapse d-sm-inline-flex justify-content-between">
-                    <ul class="navbar-nav flex-grow-1">
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Index">Home</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
-                        </li>
+<body class="app-dark">
+    <header class="app-header">
+        <div class="container app-navbar d-flex align-items-center justify-content-between">
+            <div class="d-flex align-items-center gap-3">
+                <a class="d-flex align-items-center gap-2" asp-controller="Home" asp-action="Index">
+                    <span class="brand-mark" aria-hidden="true">
+                        <svg viewBox="0 0 24 24" width="20" height="20">
+                            <path fill="white" d="M12 2a10 10 0 100 20 10 10 0 000-20zm0 2a8 8 0 110 16 8 8 0 010-16zm0 3a5 5 0 100 10 5 5 0 000-10zm0 2a3 3 0 110 6 3 3 0 010-6z" />
+                        </svg>
+                    </span>
+                    <span class="brand-name">Mystic Reel</span>
+                </a>
 
-                        <li class="nav-item">
-                            <span class="nav-link text-muted">|</span>
-                        </li>
+                <nav class="d-flex align-items-center gap-1">
+                    <a class="app-nav-link" asp-controller="Movies" asp-action="Index">Фільми</a>
+                    <a class="app-nav-link" asp-controller="Sessions" asp-action="Index">Сеанси</a>
 
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Movies" asp-action="Index">Movies</a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link text-dark" asp-controller="Sessions" asp-action="Index">Sessions</a>
-                        </li>
-
-
-                        @if (User.IsInRole("Admin"))
+                    @if (User?.Identity?.IsAuthenticated ?? false)
+                    {
+                        if (User.IsInRole("Admin"))
                         {
-                            <li class="nav-item">
-                                <span class="nav-link text-muted">|</span>
-                            </li>
-                            <li class="nav-item">
-                                <a class="nav-link text-danger" asp-controller="AdminFilms" asp-action="Index">Admin Films</a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link text-danger" asp-controller="AdminSessions" asp-action="Index">Admin Sessions</a>
-                            </li>
-  
-                            <li class="nav-item">
-                                <a class="nav-link text-danger" asp-controller="AdminOrders" asp-action="Index">Admin Orders</a>
-                            </li>
-
-                            <li class="nav-item">
-                                <a class="nav-link text-danger" asp-controller="AdminSeatTypes" asp-action="Index">Admin SeatTypes</a>
-                            </li>
+                            <span class="app-divider">|</span>
+                            <a class="app-nav-link" asp-controller="AdminFilms" asp-action="Index">Адмін: фільми</a>
+                            <a class="app-nav-link" asp-controller="AdminSessions" asp-action="Index">Адмін: сеанси</a>
+                            <a class="app-nav-link" asp-controller="AdminOrders" asp-action="Index">Адмін: замовлення</a>
+                            <a class="app-nav-link" asp-controller="AdminSeatTypes" asp-action="Index">Адмін: типи місць</a>
                         }
-
-                        <partial name="_LoginPartial" />
-                    </ul>
-                </div>
+                    }
+                </nav>
             </div>
-        </nav>
-    </header>
-    <div class="container">
-        <main role="main" class="pb-3">
-            @RenderBody()
-        </main>
-    </div>
 
-    <footer class="border-top footer text-muted">
-        <div class="container">
-            &copy; 2026 - CinemaWeb - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
+            <div>
+                <partial name="_LoginPartial" />
+            </div>
         </div>
-    </footer>
-    <script src="~/lib/jquery/dist/jquery.min.js"></script>
+    </header>
+
+    <main role="main">
+        @RenderBody()
+    </main>
+
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
-    <script src="~/js/site.js" asp-append-version="true"></script>
-    @await RenderSectionAsync("Scripts", required: false)
+    @RenderSection("Scripts", required: false)
 </body>
 </html>

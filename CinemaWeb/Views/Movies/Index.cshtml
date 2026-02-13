@@ -2,131 +2,103 @@
 
 @{
     ViewData["Title"] = "Афіша";
-}
-<link rel="stylesheet" href="~/css/clientmovies.css" />
 
-<div class="container mt-5">
-    <div class="row mb-4">
-        <div class="col-md-6">
-            <form asp-action="Index" method="get" class="d-flex gap-2">
+    string PosterOrPlaceholder(string? url)
+    {
+        if (string.IsNullOrWhiteSpace(url)) return Url.Content("~/img/poster-placeholder.jpg");
+        var u = url.Trim().Replace("\\", "/");
+        if (u.StartsWith("http", StringComparison.OrdinalIgnoreCase)) return u;
+        if (u.StartsWith("/")) return Url.Content("~" + u);
+        return Url.Content("~/" + u.TrimStart('/'));
+    }
+}
+
+<div class="container app-page">
+    <div class="row g-3 align-items-end mb-3">
+        <div class="col-lg-8">
+            <form asp-action="Index" method="get" class="d-flex gap-2 flex-wrap">
                 <input type="text" name="searchTerm" class="form-control"
                        placeholder="Пошук фільму за назвою..." value="@Model.SearchTerm" />
-                <button type="submit" class="btn btn-primary">Знайти</button>
+                <button type="submit" class="btn app-btn-primary">Знайти</button>
                 @if (!string.IsNullOrEmpty(Model.SearchTerm))
                 {
-                    <a asp-action="Index" class="btn btn-secondary">Скинути</a>
+                    <a asp-action="Index" class="btn app-btn-outline">Скинути</a>
                 }
             </form>
         </div>
+
+        <div class="col-lg-4 d-flex justify-content-lg-end">
+            <div class="d-flex gap-2 align-items-center flex-wrap">
+                <span style="color:rgba(232,236,243,0.90);">Сортувати за:</span>
+                <a asp-action="Index"
+                   asp-route-sortOrder=""
+                   asp-route-searchTerm="@Model.SearchTerm"
+                   class="btn btn-sm @(ViewData["CurrentSort"] == null ? "app-btn-primary" : "app-btn-outline")">
+                    Датою
+                </a>
+                <a asp-action="Index"
+                   asp-route-sortOrder="name"
+                   asp-route-searchTerm="@Model.SearchTerm"
+                   class="btn btn-sm @((ViewData["CurrentSort"] as string) == "name" ? "app-btn-primary" : "app-btn-outline")">
+                    Назвою
+                </a>
+            </div>
+        </div>
     </div>
 
-    <div class="mb-4">
-        <span class="text-muted me-2">Сортувати за:</span>
-        <a asp-action="Index"
-           asp-route-sortOrder=""
-           asp-route-searchTerm="@Model.SearchTerm"
-           class="btn btn-sm @(ViewData["CurrentSort"] == null ? "btn-primary" : "btn-outline-secondary")">
-            Датою
-        </a>
-        <a asp-action="Index"
-           asp-route-sortOrder="name"
-           asp-route-searchTerm="@Model.SearchTerm"
-           class="btn btn-sm @(ViewData["CurrentSort"] as string == "name" ? "btn-primary" : "btn-outline-secondary")">
-            Назвою
-        </a>
-    </div>
-
-    <section class="mb-5">
-        <h2 class="mb-4 border-bottom pb-2 fw-bold">Зараз у кіно</h2>
+    <section class="section">
+        <div class="section-head">
+            <h2 class="section-title">Зараз у кіно</h2>
+        </div>
 
         @if (!Model.ActualFilms.Any())
         {
-            <div class="alert alert-info shadow-sm">На жаль, актуальних сеансів не знайдено.</div>
+            <div class="hero-note">На жаль, актуальних сеансів не знайдено.</div>
         }
         else
         {
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+            <div class="film-grid">
                 @foreach (var film in Model.ActualFilms)
                 {
-                    <div class="col">
-                         <a asp-controller="Movies" asp-action="Details" asp-route-id="@film.Id" class="movie-card-link">
-                        <div class="card h-100 border-0 bg-light">
-                            @if (!string.IsNullOrEmpty(film.PosterUrl))
-                            {
-                                <img src="@film.PosterUrl" class="card-img-top" alt="@film.Name"
-                                     style="height: 350px; object-fit: cover;">
-                            }
-                            else
-                            {
-                                <div class="card-img-top bg-secondary text-white d-flex align-items-center justify-content-center" style="height: 350px;">
-                                    <span>Постер відсутній</span>
-                                </div>
-                            }
-                            <div class="card-body d-flex flex-column">
-                                <h5 class="card-title text-truncate" title="@film.Name">@film.Name</h5>
-                                <p class="card-text small text-muted">
-                                    Тривалість: @film.DurationMinutes хв
-                                </p>
-                            </div>
-                            
+                    <a class="film-card"
+                       asp-controller="Movies"
+                       asp-action="Details"
+                       asp-route-id="@film.Id">
+                        <img class="film-card-img" src="@PosterOrPlaceholder(film.PosterUrl)" alt="@film.Name" loading="lazy" />
+                        <div class="film-card-overlay">
+                            <div class="film-card-title">@film.Name</div>
                         </div>
-                        </a>
-                    </div>
+                    </a>
                 }
             </div>
         }
     </section>
 
-    <section>
-        <h2 class="mb-4 border-bottom pb-2 fw-bold">Скоро</h2>
+    <section class="section">
+        <div class="section-head">
+            <h2 class="section-title">Скоро</h2>
+        </div>
+
         @if (!Model.ExpectedFilms.Any())
         {
-            <p class="text-muted">Список очікуваних фільмів порожній.</p>
+            <div class="hero-note">Список очікуваних фільмів порожній.</div>
         }
         else
         {
-            <div class="row row-cols-1 row-cols-sm-2 row-cols-md-3 row-cols-lg-4 g-4">
+            <div class="film-grid">
                 @foreach (var film in Model.ExpectedFilms)
                 {
-                    <div class="col">
-                        <a asp-controller="Movies" asp-action="Details" asp-route-id="@film.Id" class="movie-card-link">
-                        <div class="card h-100 border-0 bg-light">
-                            <div style="position: relative;">
-                                @if (!string.IsNullOrEmpty(film.PosterUrl))
-                                {
-                                    <img src="@film.PosterUrl" class="card-img-top" alt="@film.Name"
-                                         style="height: 350px; object-fit: cover; filter: grayscale(40%);">
-                                }
-                                else
-                                {
-                                    <div class="card-img-top bg-light d-flex align-items-center justify-content-center" style="height: 350px;">
-                                        <span>No Poster</span>
-                                    </div>
-                                }
-                                <span class="badge bg-warning text-dark position-absolute top-0 end-0 m-2">
-                                    @(film.ReleaseDate.HasValue? film.ReleaseDate.Value.ToString("dd.MM.yyyy") : "Скоро")
-                                </span>
-                            </div>
-
-                            <div class="card-body">
-                                <h5 class="card-title text-truncate">@film.Name</h5>
-                            </div>
+                    <a class="film-card"
+                       asp-controller="Movies"
+                       asp-action="Details"
+                       asp-route-id="@film.Id">
+                        <img class="film-card-img film-card-img-muted" src="@PosterOrPlaceholder(film.PosterUrl)" alt="@film.Name" loading="lazy" />
+                        <div class="film-card-overlay">
+                            <div class="film-card-title">@film.Name</div>
                         </div>
-                        </a>
-                    </div>
+                    </a>
                 }
             </div>
         }
     </section>
 </div>
-
-<style>
-    .transition-hover {
-        transition: transform 0.2s ease, box-shadow 0.2s ease;
-    }
-
-        .transition-hover:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.12) !important;
-        }
-</style>

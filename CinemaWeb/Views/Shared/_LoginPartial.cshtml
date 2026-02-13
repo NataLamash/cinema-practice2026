@@ -2,28 +2,24 @@
 @inject SignInManager<IdentityUser> SignInManager
 @inject UserManager<IdentityUser> UserManager
 
-<ul class="navbar-nav ms-auto">
-    @if (SignInManager.IsSignedIn(User))
-    {
-        <li class="nav-item">
-            <span class="nav-link text-muted">Привіт, @User.Identity?.Name</span>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link text-dark" asp-controller="Account" asp-action="Orders">Мої замовлення</a>
-        </li>
-        <li class="nav-item">
-            <form asp-area="Identity" asp-page="/Account/Logout" method="post" class="d-inline">
-                <button type="submit" class="nav-link bg-transparent border-0 text-dark">Вийти</button>
+@if (SignInManager.IsSignedIn(User))
+{
+    <li class="nav-item app-auth-li">
+        <div class="app-auth-row">
+            <a class="app-auth-btn" asp-controller="Account" asp-action="Orders">Профіль</a>
+
+            <form class="app-auth-form" asp-area="Identity" asp-page="/Account/Logout" method="post">
+                <button type="submit" class="app-auth-btn app-auth-btn-outline">Вийти</button>
             </form>
-        </li>
-    }
-    else
-    {
-        <li class="nav-item">
-            <a class="nav-link" asp-area="Identity" asp-page="/Account/Register">Зареєструватися</a>
-        </li>
-        <li class="nav-item">
-            <a class="nav-link" asp-area="Identity" asp-page="/Account/Login">Увійти</a>
-        </li>
-    }
-</ul>
+        </div>
+    </li>
+}
+else
+{
+    <li class="nav-item app-auth-li">
+        <div class="app-auth-row">
+            <a class="app-auth-btn" asp-area="Identity" asp-page="/Account/Register">Зареєструватися</a>
+            <a class="app-auth-btn app-auth-btn-outline" asp-area="Identity" asp-page="/Account/Login">Увійти</a>
+        </div>
+    </li>
+}

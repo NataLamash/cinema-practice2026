@@ -13,5 +13,6 @@ public class ClientSessionViewModel
     public string FilmName { get; set; } = string.Empty;
 
     public string HallName { get; set; } = string.Empty;
+    public string? PosterUrl { get; set; }
 
 }
