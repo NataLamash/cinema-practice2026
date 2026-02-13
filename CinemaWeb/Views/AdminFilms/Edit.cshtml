@@ -1,0 +1,122 @@
+@model CinemaWeb.ViewModels.FilmFormViewModel
+
+@{
+    ViewData["Title"] = "Edit Film";
+}
+
+<div class="container">
+    <h2 class="mb-4">Edit Film: @Model.Name</h2>
+
+    <form asp-action="Edit" method="post" enctype="multipart/form-data">
+        <input type="hidden" asp-for="Id" />
+        <input type="hidden" asp-for="PosterUrl" />
+
+        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+        <div class="row">
+            <div class="col-md-6">
+                <div class="card mb-3">
+                    <div class="card-header bg-warning text-dark">Basic Information</div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="Name" class="form-label fw-bold"></label> <span class="text-danger">*</span>
+                            <input asp-for="Name" class="form-control" />
+                            <span asp-validation-for="Name" class="text-danger"></span>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="Description" class="form-label"></label>
+                            <textarea asp-for="Description" class="form-control" rows="4"></textarea>
+                            <span asp-validation-for="Description" class="text-danger"></span>
+                        </div>
+                        <div class="row">
+                            <div class="col-6 mb-3">
+                                <label asp-for="DurationMinutes" class="form-label fw-bold"></label> <span class="text-danger">*</span>
+                                <input asp-for="DurationMinutes" class="form-control" type="number" />
+                                <span asp-validation-for="DurationMinutes" class="text-danger"></span>
+                            </div>
+                            <div class="col-6 mb-3">
+                                <label asp-for="AllowedMinAge" class="form-label"></label>
+                                <input asp-for="AllowedMinAge" class="form-control" type="number" />
+                                <span asp-validation-for="AllowedMinAge" class="text-danger"></span>
+                            </div>
+                        </div>
+                        <div class="mb-3">
+                            <label asp-for="ReleaseDate" class="form-label"></label>
+                            <input asp-for="ReleaseDate" class="form-control" type="date" />
+                            <span asp-validation-for="ReleaseDate" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card mb-3">
+                    <div class="card-header bg-secondary text-white">Media</div>
+                    <div class="card-body">
+                        @if (!string.IsNullOrEmpty(Model.PosterUrl))
+                        {
+                            <div class="mb-3 text-center">
+                                <img src="@Model.PosterUrl" alt="Current Poster" class="img-thumbnail" style="max-height: 200px;" />
+                                <p class="text-muted small">Current Poster</p>
+                            </div>
+                        }
+
+                        <div class="mb-3">
+                            <label asp-for="PosterFile" class="form-label">Change Poster</label>
+                            <input asp-for="PosterFile" class="form-control" type="file" accept="image/*" />
+                            <small class="text-muted">Leave empty to keep the current poster.</small>
+                            <span asp-validation-for="PosterFile" class="text-danger"></span>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="TrailerUrl" class="form-label"></label>
+                            <input asp-for="TrailerUrl" class="form-control" />
+                            <span asp-validation-for="TrailerUrl" class="text-danger"></span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card mb-3">
+                    <div class="card-header bg-info text-white">Additional information</div>
+                    <div class="card-body">
+                        <div class="mb-3">
+                            <label asp-for="ProducerId" class="form-label"></label>
+                            <select asp-for="ProducerId" class="form-select" asp-items="Model.ProducersList">
+                                <option value="">-- Select Producer (None) --</option>
+                            </select>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="SelectedGenreIds" class="form-label"></label>
+                            <select asp-for="SelectedGenreIds" class="form-select" asp-items="Model.GenresList" multiple style="min-height: 120px;"></select>
+                            <small class="text-muted d-block mt-1">Hold Ctrl (Cmd) to select multiple.</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="SelectedActorIds" class="form-label"></label>
+                            <select asp-for="SelectedActorIds" class="form-select" asp-items="Model.ActorsList" multiple style="min-height: 150px;"></select>
+                            <small class="text-muted d-block mt-1">Hold Ctrl (Cmd) to select multiple.</small>
+                        </div>
+
+                        <div class="mb-3">
+                            <label asp-for="SelectedCompanyIds" class="form-label"></label>
+                            <select asp-for="SelectedCompanyIds" class="form-select" asp-items="Model.CompaniesList" multiple style="min-height: 120px;"></select>
+                            <small class="text-muted d-block mt-1">Hold Ctrl (Cmd) to select multiple.</small>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="d-flex gap-2 mt-3 mb-5">
+            <button type="submit" class="btn btn-warning btn-lg">Update Film</button>
+            <a asp-action="Index" class="btn btn-outline-secondary btn-lg">Back</a>
+        </div>
+    </form>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

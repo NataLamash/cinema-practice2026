@@ -1,0 +1,70 @@
+@model CinemaWeb.ViewModels.SessionViewModel
+
+@{
+    var now = DateTime.Now.ToString("yyyy-MM-ddTHH:mm");
+}
+
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow border-warning">
+                <div class="card-header bg-warning">
+                    <h4 class="mb-0">Редагування сеансу</h4>
+                </div>
+                <div class="card-body">
+                    <form asp-action="Edit">
+                        <input type="hidden" asp-for="Id" />
+
+                        <div asp-validation-summary="ModelOnly" class="text-danger mb-3"></div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="FilmId" class="form-label font-weight-bold">Фільм</label>
+                                <select asp-for="FilmId" class="form-select" asp-items="ViewBag.Films"></select>
+                                <span asp-validation-for="FilmId" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="HallId" class="form-label font-weight-bold">Кінозал</label>
+                                <select asp-for="HallId" class="form-select" asp-items="ViewBag.Halls"></select>
+                                <span asp-validation-for="HallId" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="StartTime" class="form-label font-weight-bold">Початок</label>
+                                <input asp-for="StartTime" class="form-control" type="datetime-local" step="60" min="@now" />
+                                <span asp-validation-for="StartTime" class="text-danger"></span>
+                            </div>
+                            <div class="col-md-6 mb-3">
+                                <label asp-for="EndTime" class="form-label font-weight-bold">Завершення</label>
+                                <input asp-for="EndTime" class="form-control" type="datetime-local" step="60" min="@now" />
+                                <span asp-validation-for="EndTime" class="text-danger"></span>
+                            </div>
+                        </div>
+
+                        <div class="mb-4">
+                            <label asp-for="BasePrice" class="form-label font-weight-bold">Базова ціна</label>
+                            <div class="input-group">
+                                <input asp-for="BasePrice" class="form-control" type="number" step="0.01" />
+                                <span class="input-group-text">грн</span>
+                            </div>
+                            <span asp-validation-for="BasePrice" class="text-danger"></span>
+                        </div>
+
+                        <div class="d-flex justify-content-between">
+                            <a asp-action="Index" class="btn btn-link text-secondary">Повернутися до списку</a>
+                            <button type="submit" class="btn btn-warning px-4 text-dark font-weight-bold">Оновити дані</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+@section Scripts {
+    @{
+        await Html.RenderPartialAsync("_ValidationScriptsPartial");
+    }
+}

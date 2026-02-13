@@ -1,0 +1,54 @@
+@model CinemaWeb.ViewModels.OrderDetailsViewModel
+
+@{
+    ViewData["Title"] = "Деталі замовлення #" + Model.OrderId;
+}
+
+<div class="container app-page">
+    <div class="section-head">
+        <h2 class="section-title">Замовлення #@Model.OrderId</h2>
+        <span class="badge-soft @(Model.Status == "Paid" ? "success" : "muted")">@Model.Status</span>
+    </div>
+
+    <div class="hero-note" style="margin-bottom:16px;">
+        <div style="color:rgba(232,236,243,0.70);">Дата замовлення: @Model.OrderDate.ToString("F")</div>
+    </div>
+
+    <div class="section-head">
+        <h3 class="section-title" style="font-size:22px;">Квитки</h3>
+    </div>
+
+    <div class="table-responsive">
+        <table class="app-table">
+            <thead>
+                <tr>
+                    <th>Фільм</th>
+                    <th>Час сеансу</th>
+                    <th>Зал</th>
+                    <th>Місце</th>
+                    <th>Ціна</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var ticket in Model.Tickets)
+                {
+                    <tr>
+                        <td style="font-weight:800;">@ticket.FilmTitle</td>
+                        <td>@ticket.SessionStart.ToString("g")</td>
+                        <td>@ticket.HallName</td>
+                        <td>Ряд: <strong>@ticket.Row</strong>, Місце: <strong>@ticket.SeatNumber</strong></td>
+                        <td>@ticket.Price.ToString("C")</td>
+                    </tr>
+                }
+                <tr>
+                    <td colspan="4" style="text-align:right; font-weight:800;">Загальна сума:</td>
+                    <td style="font-weight:800;">@Model.Tickets.Sum(t => t.Price).ToString("C")</td>
+                </tr>
+            </tbody>
+        </table>
+    </div>
+
+    <div style="margin-top:14px;">
+        <a asp-action="Orders" class="btn app-btn-outline">Назад до списку</a>
+    </div>
+</div>
